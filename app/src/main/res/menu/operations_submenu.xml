@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:id="@+id/new_installation"
+        android:title="Nueva instalación" />
+    <item
+        android:id="@+id/active_services"
+        android:title="Servicios activos" />
+    <item
+        android:id="@+id/pending_verifications"
+        android:title="Verificaciones pendientes" />
+</menu>

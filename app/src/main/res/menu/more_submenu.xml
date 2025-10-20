@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:id="@+id/technicians"
+        android:title="Técnicos" />
+    <item
+        android:id="@+id/units"
+        android:title="Unidades" />
+    <item
+        android:id="@+id/reports"
+        android:title="Reportes" />
+    <item
+        android:id="@+id/categories"
+        android:title="Categorías" />
+    <item
+        android:id="@+id/settings"
+        android:title="Configuración" />
+</menu>

@@ -1,0 +1,18 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:id="@+id/nav_tecnicos"
+        android:icon="@drawable/ic_tecnicos"
+        android:title="Tecnicos" />
+    <item
+        android:id="@+id/nav_categorias"
+        android:icon="@drawable/ic_categorias"
+        android:title="Categorias" />
+    <item
+        android:id="@+id/nav_clientes"
+        android:icon="@drawable/ic_clients"
+        android:title="Clientes" />
+    <item
+        android:id="@+id/nav_logout"
+        android:icon="@drawable/baseline_logout_24"
+        android:title="Cerrar sesión" />
+</menu>
