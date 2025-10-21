@@ -30,7 +30,7 @@ class UnitsRepository(private val apiService: ApiService) {
         return withContext(Dispatchers.IO) {
             val response = apiService.createUnit(unitRequest)
             if (response.isSuccessful) {
-                response.body()!!
+                ApiResponse(true, response.body()?.message ?: "Unidad creada exitosamente")
             } else {
                 ApiResponse(false, "Error al crear la unidad")
             }
@@ -41,7 +41,7 @@ class UnitsRepository(private val apiService: ApiService) {
         return withContext(Dispatchers.IO) {
             val response = apiService.updateUnit(unit.id, unit)
             if (response.isSuccessful) {
-                response.body()!!
+                ApiResponse(true, response.body()?.message ?: "Unidad actualizada exitosamente")
             } else {
                 ApiResponse(false, "Error al actualizar la unidad")
             }
@@ -50,9 +50,9 @@ class UnitsRepository(private val apiService: ApiService) {
 
     suspend fun deleteUnit(id: Int): ApiResponse {
         return withContext(Dispatchers.IO) {
-            val response = apiService.deleteUnit(id)
+            val response = apiService.deleteUnit(UnitIdBody(id))
             if (response.isSuccessful) {
-                response.body()!!
+                ApiResponse(true, response.body()?.message ?: "Unidad eliminada exitosamente")
             } else {
                 ApiResponse(false, "Error al eliminar la unidad")
             }

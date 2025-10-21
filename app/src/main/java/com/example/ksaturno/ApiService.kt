@@ -1,14 +1,19 @@
 package com.example.ksaturno
 
 import com.example.ksaturno.categories.Category
+import com.example.ksaturno.categories.CategoryIdBody
 import com.example.ksaturno.categories.CreateCategoryRequest
 import com.example.ksaturno.clients.Client
+import com.example.ksaturno.clients.ClientIdBody
+import com.example.ksaturno.clients.CreateClientRequest
 import com.example.ksaturno.units.CreateUnitRequest
 import com.example.ksaturno.units.Unit
+import com.example.ksaturno.units.UnitIdBody
 import retrofit2.Response
 import retrofit2.http.Body
 import retrofit2.http.DELETE
 import retrofit2.http.GET
+import retrofit2.http.HTTP
 import retrofit2.http.POST
 import retrofit2.http.PUT
 import retrofit2.http.Path
@@ -28,8 +33,8 @@ interface ApiService {
     @PUT("categorias/actualizar.php/{id}")
     suspend fun updateCategory(@Path("id") id: Int, @Body category: Category): Response<ApiResponse>
 
-    @DELETE("categorias/eliminar.php/{id}")
-    suspend fun deleteCategory(@Path("id") id: Int): Response<ApiResponse>
+    @HTTP(method = "DELETE", path = "categorias/eliminar.php", hasBody = true)
+    suspend fun deleteCategory(@Body body: CategoryIdBody): Response<ApiResponse>
 
     // Units
     @GET("unidades/listar.php")
@@ -41,10 +46,19 @@ interface ApiService {
     @PUT("unidades/actualizar.php/{id}")
     suspend fun updateUnit(@Path("id") id: Int, @Body unit: Unit): Response<ApiResponse>
 
-    @DELETE("unidades/eliminar.php/{id}")
-    suspend fun deleteUnit(@Path("id") id: Int): Response<ApiResponse>
+    @HTTP(method = "DELETE", path = "unidades/eliminar.php", hasBody = true)
+    suspend fun deleteUnit(@Body body: UnitIdBody): Response<ApiResponse>
 
     // Clients
     @GET("clientes/listar.php")
     suspend fun getClients(): Response<List<Client>>
+
+    @POST("clientes/grabar.php")
+    suspend fun createClient(@Body request: CreateClientRequest): Response<ApiResponse>
+
+    @PUT("clientes/actualizar.php/{id}")
+    suspend fun updateClient(@Path("id") id: Int, @Body client: Client): Response<ApiResponse>
+
+    @HTTP(method = "DELETE", path = "clientes/eliminar.php", hasBody = true)
+    suspend fun deleteClient(@Body body: ClientIdBody): Response<ApiResponse>
 }

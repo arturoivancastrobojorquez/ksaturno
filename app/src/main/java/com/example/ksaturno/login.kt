@@ -1,6 +1,6 @@
 package com.example.ksaturno
 
-import android.content.Intent // Added this import
+import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import android.widget.Button
@@ -58,12 +58,7 @@ class login : AppCompatActivity() {
                     val loginApiResponse = response.body()
                     if (loginApiResponse != null) {
                         if (loginApiResponse.success) {
-                            // Login successful
-                            val userId = loginApiResponse.user?.id
-                            val userName = loginApiResponse.user?.username
-                            Toast.makeText(this@login, "Login Successful! User ID: $userId, Username: $userName", Toast.LENGTH_LONG).show()
-                            
-                            // Navigate to MainActivity
+                            // Login successful - Navigate to MainActivity
                             val intent = Intent(this@login, MainActivity::class.java)
                             startActivity(intent)
                             finish() // Finish login activity so user can't go back
