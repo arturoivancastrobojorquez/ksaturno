@@ -11,7 +11,7 @@ import androidx.core.view.WindowInsetsCompat
 
 class splash : AppCompatActivity() {
 
-    private val SPLASH_TIME_OUT: Long = 3000 // 5 seconds
+    private val SPLASH_TIME_OUT: Long = 2000 // 2 seconds
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
