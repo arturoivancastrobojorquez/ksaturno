@@ -16,6 +16,7 @@ import androidx.fragment.app.Fragment
 import com.example.ksaturno.categories.CategoriesFragment
 import com.example.ksaturno.clients.ClientSearchFragment
 import com.example.ksaturno.clients.ClientsFragment
+import com.example.ksaturno.technicians.TechniciansFragment
 import com.example.ksaturno.units.UnitsFragment
 import com.google.android.material.bottomnavigation.BottomNavigationView
 
@@ -25,11 +26,9 @@ class MainActivity : AppCompatActivity(), BottomNavigationView.OnNavigationItemS
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        // --- FIX: Enable edge-to-edge mode to correctly handle system bars ---
         enableEdgeToEdge()
         setContentView(R.layout.activity_main)
 
-        // --- Solution for Status Bar Overlap ---
         val mainLayout: View = findViewById(R.id.main)
         ViewCompat.setOnApplyWindowInsetsListener(mainLayout) { v, insets ->
             val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
@@ -43,28 +42,23 @@ class MainActivity : AppCompatActivity(), BottomNavigationView.OnNavigationItemS
         bottomNavigationView = findViewById(R.id.bottom_navigation)
         bottomNavigationView.setOnNavigationItemSelectedListener(this)
 
-        // Set initial state to Home
         if (savedInstanceState == null) {
             supportActionBar?.title = "Inicio"
-            replaceFragment(Fragment()) // Start with a blank fragment
+            replaceFragment(Fragment()) 
         }
 
-        // --- Handle Back Press with OnBackPressedDispatcher ---
         val onBackPressedCallback = object : OnBackPressedCallback(true) {
             override fun handleOnBackPressed() {
                 if (supportFragmentManager.backStackEntryCount > 0) {
-                    // If there are fragments on the back stack, pop it
                     supportFragmentManager.popBackStack()
                 } else {
-                    // If we are at the top level, show the exit confirmation dialog
                     AlertDialog.Builder(this@MainActivity)
                         .setTitle("Confirmar Salida")
                         .setMessage("¿Estás seguro de que deseas cerrar la aplicación?")
                         .setPositiveButton("Sí") { _, _ ->
-                            // If user clicks "Yes", close the app
                             finish()
                         }
-                        .setNegativeButton("No", null) // If "No", just dismiss the dialog
+                        .setNegativeButton("No", null)
                         .show()
                 }
             }
@@ -76,7 +70,7 @@ class MainActivity : AppCompatActivity(), BottomNavigationView.OnNavigationItemS
         supportActionBar?.title = item.title
         when (item.itemId) {
             R.id.navigation_home -> {
-                replaceFragment(Fragment()) // Replace with a blank fragment
+                replaceFragment(Fragment()) 
                 return true
             }
             R.id.navigation_clients -> {
@@ -91,7 +85,7 @@ class MainActivity : AppCompatActivity(), BottomNavigationView.OnNavigationItemS
                     else -> R.menu.more_submenu
                 }
                 showPopupMenu(anchorView, menuRes)
-                return false // Important: Do not consume the event
+                return false 
             }
         }
         return false
@@ -108,6 +102,10 @@ class MainActivity : AppCompatActivity(), BottomNavigationView.OnNavigationItemS
                 }
                 R.id.units -> {
                     replaceFragment(UnitsFragment())
+                    true
+                }
+                R.id.technicians -> {
+                    replaceFragment(TechniciansFragment())
                     true
                 }
                 else -> {
@@ -129,6 +127,4 @@ class MainActivity : AppCompatActivity(), BottomNavigationView.OnNavigationItemS
 
         transaction.commit()
     }
-
-    // The old onBackPressed() method has been removed.
 }

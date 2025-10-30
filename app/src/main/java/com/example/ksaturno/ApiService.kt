@@ -6,14 +6,16 @@ import com.example.ksaturno.categories.CreateCategoryRequest
 import com.example.ksaturno.clients.Client
 import com.example.ksaturno.clients.ClientIdBody
 import com.example.ksaturno.clients.CreateClientRequest
+import com.example.ksaturno.technicians.CreateTechnicianRequest
+import com.example.ksaturno.technicians.Technician
+import com.example.ksaturno.technicians.TechnicianIdBody
 import com.example.ksaturno.units.CreateUnitRequest
 import com.example.ksaturno.units.Unit
 import com.example.ksaturno.units.UnitIdBody
 import retrofit2.Response
 import retrofit2.http.Body
-import retrofit2.http.DELETE
-import retrofit2.http.GET
 import retrofit2.http.HTTP
+import retrofit2.http.GET
 import retrofit2.http.POST
 import retrofit2.http.PUT
 import retrofit2.http.Path
@@ -61,4 +63,17 @@ interface ApiService {
 
     @HTTP(method = "DELETE", path = "clientes/eliminar.php", hasBody = true)
     suspend fun deleteClient(@Body body: ClientIdBody): Response<ApiResponse>
+
+    // Technicians
+    @GET("tecnicos/listar.php")
+    suspend fun getTechnicians(): Response<List<Technician>>
+
+    @POST("tecnicos/grabar.php")
+    suspend fun createTechnician(@Body request: CreateTechnicianRequest): Response<ApiResponse>
+
+    @PUT("tecnicos/actualizar.php/{id}")
+    suspend fun updateTechnician(@Path("id") id: Int, @Body technician: Technician): Response<ApiResponse>
+
+    @HTTP(method = "DELETE", path = "tecnicos/eliminar.php", hasBody = true)
+    suspend fun deleteTechnician(@Body body: TechnicianIdBody): Response<ApiResponse>
 }
