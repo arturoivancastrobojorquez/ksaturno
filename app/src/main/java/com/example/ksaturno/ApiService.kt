@@ -92,4 +92,5 @@ interface ApiService {
 
     @HTTP(method = "DELETE", path = "items_lista_verificacion/eliminar.php", hasBody = true)
     suspend fun deleteChecklistItem(@Body body: ChecklistItemIdBody): Response<ApiResponse>
+
 }
