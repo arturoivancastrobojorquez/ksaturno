@@ -3,6 +3,9 @@ package com.example.ksaturno
 import com.example.ksaturno.categories.Category
 import com.example.ksaturno.categories.CategoryIdBody
 import com.example.ksaturno.categories.CreateCategoryRequest
+import com.example.ksaturno.checklist.ChecklistItem
+import com.example.ksaturno.checklist.ChecklistItemIdBody
+import com.example.ksaturno.checklist.CreateChecklistItemRequest
 import com.example.ksaturno.clients.Client
 import com.example.ksaturno.clients.ClientIdBody
 import com.example.ksaturno.clients.CreateClientRequest
@@ -76,4 +79,17 @@ interface ApiService {
 
     @HTTP(method = "DELETE", path = "tecnicos/eliminar.php", hasBody = true)
     suspend fun deleteTechnician(@Body body: TechnicianIdBody): Response<ApiResponse>
+
+    // Checklist Items
+    @GET("items_lista_verificacion/listar.php")
+    suspend fun getChecklistItems(): Response<List<ChecklistItem>>
+
+    @POST("items_lista_verificacion/grabar.php")
+    suspend fun createChecklistItem(@Body request: CreateChecklistItemRequest): Response<ApiResponse>
+
+    @PUT("items_lista_verificacion/actualizar.php/{id}")
+    suspend fun updateChecklistItem(@Path("id") id: Int, @Body item: ChecklistItem): Response<ApiResponse>
+
+    @HTTP(method = "DELETE", path = "items_lista_verificacion/eliminar.php", hasBody = true)
+    suspend fun deleteChecklistItem(@Body body: ChecklistItemIdBody): Response<ApiResponse>
 }

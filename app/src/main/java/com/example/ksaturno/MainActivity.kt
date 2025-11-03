@@ -14,6 +14,7 @@ import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.fragment.app.Fragment
 import com.example.ksaturno.categories.CategoriesFragment
+import com.example.ksaturno.checklist.ChecklistFragment
 import com.example.ksaturno.clients.ClientSearchFragment
 import com.example.ksaturno.clients.ClientsFragment
 import com.example.ksaturno.technicians.TechniciansFragment
@@ -106,6 +107,10 @@ class MainActivity : AppCompatActivity(), BottomNavigationView.OnNavigationItemS
                 }
                 R.id.technicians -> {
                     replaceFragment(TechniciansFragment())
+                    true
+                }
+                R.id.checklist_items -> {
+                    replaceFragment(ChecklistFragment())
                     true
                 }
                 else -> {
