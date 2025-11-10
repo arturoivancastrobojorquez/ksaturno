@@ -86,8 +86,8 @@ class TechniciansAdapter(
          */
         fun bind(technician: Technician) {
             // Asigna el nombre y el correo del técnico a los TextViews correspondientes.
-            nameTextView.text = technician.name
-            emailTextView.text = technician.email
+            nameTextView.text = technician.nombre
+            emailTextView.text = technician.correo
 
             // Configura los listeners para los íconos de acción.
             // Cuando se pulsa el ícono de editar, se invoca la función 'onEditClick'

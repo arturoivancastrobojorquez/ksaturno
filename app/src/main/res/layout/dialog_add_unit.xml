@@ -26,20 +26,12 @@
             android:layout_height="wrap_content"
             android:text="Cliente" />
 
-        <TextView
-            android:id="@+id/text_view_select_client"
+        <Spinner
+            android:id="@+id/spinner_client"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="16dp"
-            android:background="@android:drawable/edit_text"
-            android:clickable="true"
-            android:drawableEnd="@drawable/ic_search"
-            android:drawablePadding="8dp"
-            android:focusable="true"
-            android:gravity="center_vertical"
-            android:hint="Seleccionar cliente..."
-            android:padding="12dp"
-            android:textSize="18sp" />
+            android:minHeight="48dp"
+            android:layout_marginBottom="16dp" />
 
         <TextView
             android:layout_width="wrap_content"
@@ -51,6 +43,18 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="16dp" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Fecha de Instalación" />
+
+        <EditText
+            android:id="@+id/edit_text_install_date"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="16dp"
+            android:hint="YYYY-MM-DD" />
 
         <TextView
             android:layout_width="wrap_content"

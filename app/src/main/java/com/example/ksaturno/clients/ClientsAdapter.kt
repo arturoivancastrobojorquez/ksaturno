@@ -25,7 +25,8 @@ class ClientsAdapter(
     }
 
     override fun onBindViewHolder(holder: ClientViewHolder, position: Int) {
-        holder.bind(clients[position])
+        val client = clients[position]
+        holder.bind(client)
     }
 
     override fun getItemCount(): Int = clients.size
@@ -37,8 +38,9 @@ class ClientsAdapter(
         private val deleteImageView: ImageView = itemView.findViewById(R.id.image_view_delete_client)
 
         fun bind(client: Client) {
-            nameTextView.text = client.name
-            representativeTextView.text = client.representative
+            nameTextView.text = client.nombre
+            representativeTextView.text = client.representante
+
             editImageView.setOnClickListener { onEditClick(client) }
             deleteImageView.setOnClickListener { onDeleteClick(client) }
         }

@@ -99,7 +99,7 @@ class TechniciansViewModel(private val repository: TechniciansRepository) : View
      */
     fun deleteTechnician(technician: Technician) {
         viewModelScope.launch {
-            val result = repository.deleteTechnician(technician.id)
+            val result = repository.deleteTechnician(technician.idTecnico)
             _toastMessage.postValue(result.message)
             if (result.success) {
                 fetchTechnicians() // Refresca la lista tras la eliminación.

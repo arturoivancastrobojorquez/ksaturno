@@ -7,12 +7,19 @@ import android.widget.ImageView
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.example.ksaturno.R
+// Import the class with an alias to avoid the name collision with kotlin.Unit
+import com.example.ksaturno.units.Unit as DomainUnit
 
 class UnitsAdapter(
-    private var units: List<Unit>,
-    private val onEditClick: (Unit) -> kotlin.Unit,
-    private val onDeleteClick: (Unit) -> kotlin.Unit
+    private var units: List<DomainUnit>,
+    private val onEditClick: (DomainUnit) -> Unit,
+    private val onDeleteClick: (DomainUnit) -> Unit
 ) : RecyclerView.Adapter<UnitsAdapter.UnitViewHolder>() {
+
+    fun updateUnits(newUnits: List<DomainUnit>) {
+        units = newUnits
+        notifyDataSetChanged()
+    }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): UnitViewHolder {
         val view = LayoutInflater.from(parent.context).inflate(R.layout.item_unit, parent, false)
@@ -26,20 +33,14 @@ class UnitsAdapter(
 
     override fun getItemCount(): Int = units.size
 
-    fun updateUnits(newUnits: List<Unit>) {
-        units = newUnits
-        notifyDataSetChanged()
-    }
-
     inner class UnitViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         private val nameTextView: TextView = itemView.findViewById(R.id.text_view_unit_name)
-        private val statusTextView: TextView = itemView.findViewById(R.id.text_view_unit_status)
         private val editImageView: ImageView = itemView.findViewById(R.id.image_view_edit_unit)
         private val deleteImageView: ImageView = itemView.findViewById(R.id.image_view_delete_unit)
 
-        fun bind(unit: Unit) {
-            nameTextView.text = unit.name
-            statusTextView.text = unit.status
+        fun bind(unit: DomainUnit) {
+            nameTextView.text = unit.nombreUnidad
+
             editImageView.setOnClickListener { onEditClick(unit) }
             deleteImageView.setOnClickListener { onDeleteClick(unit) }
         }

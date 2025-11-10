@@ -9,6 +9,12 @@ import com.example.ksaturno.checklist.CreateChecklistItemRequest
 import com.example.ksaturno.clients.Client
 import com.example.ksaturno.clients.ClientIdBody
 import com.example.ksaturno.clients.CreateClientRequest
+import com.example.ksaturno.instalaciones.CreateInstalacionRequest
+import com.example.ksaturno.instalaciones.Instalacion
+import com.example.ksaturno.instalaciones.InstalacionIdBody
+import com.example.ksaturno.servicios.CreateServicioRequest
+import com.example.ksaturno.servicios.Servicio
+import com.example.ksaturno.servicios.ServicioIdBody
 import com.example.ksaturno.technicians.CreateTechnicianRequest
 import com.example.ksaturno.technicians.Technician
 import com.example.ksaturno.technicians.TechnicianIdBody
@@ -17,11 +23,12 @@ import com.example.ksaturno.units.Unit
 import com.example.ksaturno.units.UnitIdBody
 import retrofit2.Response
 import retrofit2.http.Body
-import retrofit2.http.HTTP
 import retrofit2.http.GET
+import retrofit2.http.HTTP
 import retrofit2.http.POST
 import retrofit2.http.PUT
 import retrofit2.http.Path
+import retrofit2.http.Query
 
 interface ApiService {
     @POST("login.php")
@@ -44,6 +51,9 @@ interface ApiService {
     // Units
     @GET("unidades/listar.php")
     suspend fun getUnits(): Response<List<Unit>>
+
+    @GET("unidades/filtrarporcliente.php")
+    suspend fun getUnitsByClient(@Query("id_cliente") clientId: Int): Response<List<Unit>>
 
     @POST("unidades/grabar.php")
     suspend fun createUnit(@Body request: CreateUnitRequest): Response<ApiResponse>
@@ -93,4 +103,29 @@ interface ApiService {
     @HTTP(method = "DELETE", path = "items_lista_verificacion/eliminar.php", hasBody = true)
     suspend fun deleteChecklistItem(@Body body: ChecklistItemIdBody): Response<ApiResponse>
 
+    // Servicios
+    @GET("servicios/listar.php")
+    suspend fun getServicios(): Response<List<Servicio>>
+
+    @POST("servicios/grabar.php")
+    suspend fun createServicio(@Body request: CreateServicioRequest): Response<ApiResponse>
+
+    @PUT("servicios/actualizar.php/{id}")
+    suspend fun updateServicio(@Path("id") id: Int, @Body servicio: Servicio): Response<ApiResponse>
+
+    @HTTP(method = "DELETE", path = "servicios/eliminar.php", hasBody = true)
+    suspend fun deleteServicio(@Body body: ServicioIdBody): Response<ApiResponse>
+
+    // Instalaciones
+    @GET("instalaciones/listar.php")
+    suspend fun getInstalaciones(): Response<List<Instalacion>>
+
+    @POST("instalaciones/grabar.php")
+    suspend fun createInstalacion(@Body request: CreateInstalacionRequest): Response<ApiResponse>
+
+    @PUT("instalaciones/actualizar.php/{id}")
+    suspend fun updateInstalacion(@Path("id") id: Int, @Body instalacion: Instalacion): Response<ApiResponse>
+
+    @HTTP(method = "DELETE", path = "instalaciones/eliminar.php", hasBody = true)
+    suspend fun deleteInstalacion(@Body body: InstalacionIdBody): Response<ApiResponse>
 }

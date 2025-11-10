@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/nav_graph"
+    app:startDestination="@id/navigation_home">
+
+    <!-- Main Bottom Nav Destinations -->
+    <fragment
+        android:id="@+id/navigation_home"
+        android:name="com.example.ksaturno.HomeFragment"
+        android:label="Inicio"
+        tools:layout="@layout/fragment_home" />
+
+    <fragment
+        android:id="@+id/navigation_clients"
+        android:name="com.example.ksaturno.clients.ClientsFragment"
+        android:label="Clientes"
+        tools:layout="@layout/fragment_clients" />
+
+    <!-- Installation List (accessed from submenu) -->
+    <fragment
+        android:id="@+id/new_installation"
+        android:name="com.example.ksaturno.instalaciones.InstalacionesFragment"
+        android:label="Instalaciones"
+        tools:layout="@layout/fragment_instalaciones">
+        <action
+            android:id="@+id/action_installations_to_form"
+            app:destination="@id/instalacionFormFragment" />
+    </fragment>
+
+    <!-- Active Services (accessed from submenu) -->
+    <fragment
+        android:id="@+id/active_services"
+        android:name="com.example.ksaturno.servicios.ServiciosFragment"
+        android:label="Servicios Activos"
+        tools:layout="@layout/fragment_servicios" />
+
+    <!-- Other Submenu Destinations -->
+    <fragment
+        android:id="@+id/units"
+        android:name="com.example.ksaturno.units.UnitsFragment"
+        android:label="Unidades"
+        tools:layout="@layout/fragment_units" />
+
+    <fragment
+        android:id="@+id/technicians"
+        android:name="com.example.ksaturno.technicians.TechniciansFragment"
+        android:label="Técnicos"
+        tools:layout="@layout/fragment_technicians" />
+
+    <fragment
+        android:id="@+id/categories"
+        android:name="com.example.ksaturno.categories.CategoriesFragment"
+        android:label="Categorías"
+        tools:layout="@layout/fragment_categories" />
+
+    <fragment
+        android:id="@+id/checklist_items"
+        android:name="com.example.ksaturno.checklist.ChecklistFragment"
+        android:label="Checklist"
+        tools:layout="@layout/fragment_checklist" />
+
+    <!-- Standalone Destinations (not in a menu) -->
+    <fragment
+        android:id="@+id/instalacionFormFragment"
+        android:name="com.example.ksaturno.instalaciones.InstalacionFormFragment"
+        android:label="Formulario de Instalación"
+        tools:layout="@layout/fragment_instalacion_form" />
+
+    <!-- Client Search is now a dialog destination -->
+    <dialog
+        android:id="@+id/clientSearchFragment"
+        android:name="com.example.ksaturno.clients.ClientSearchFragment"
+        android:label="Buscar Cliente"
+        tools:layout="@layout/fragment_client_search" />
+
+</navigation>

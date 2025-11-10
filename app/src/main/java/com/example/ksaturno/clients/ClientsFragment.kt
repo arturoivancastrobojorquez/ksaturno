@@ -34,7 +34,6 @@ class ClientsFragment : Fragment() {
         val recyclerView: RecyclerView = view.findViewById(R.id.recycler_view_clients)
         val adapter = ClientsAdapter(emptyList(), { onEditClient(it) }, { onDeleteClient(it) })
         
-        // --- FIX: Set the LayoutManager ---
         recyclerView.layoutManager = LinearLayoutManager(requireContext())
         recyclerView.adapter = adapter
 
@@ -95,11 +94,11 @@ class ClientsFragment : Fragment() {
         layout.addView(representativeEditText)
 
         if (isEditMode) {
-            nameEditText.setText(client?.name)
-            addressEditText.setText(client?.address)
-            phoneEditText.setText(client?.phone)
+            nameEditText.setText(client?.nombre)
+            addressEditText.setText(client?.direccion)
+            phoneEditText.setText(client?.telefono)
             emailEditText.setText(client?.email)
-            representativeEditText.setText(client?.representative)
+            representativeEditText.setText(client?.representante)
         }
 
         AlertDialog.Builder(context)
@@ -108,20 +107,20 @@ class ClientsFragment : Fragment() {
             .setPositiveButton("Guardar") { _, _ ->
                 if (isEditMode) {
                     val updatedClient = client!!.copy(
-                        name = nameEditText.text.toString(),
-                        address = addressEditText.text.toString(),
-                        phone = phoneEditText.text.toString(),
+                        nombre = nameEditText.text.toString(),
+                        direccion = addressEditText.text.toString(),
+                        telefono = phoneEditText.text.toString(),
                         email = emailEditText.text.toString(),
-                        representative = representativeEditText.text.toString()
+                        representante = representativeEditText.text.toString()
                     )
                     viewModel.updateClient(updatedClient)
                 } else {
-                    val request = CreateClientRequest(
-                        name = nameEditText.text.toString(),
-                        address = addressEditText.text.toString(),
-                        phone = phoneEditText.text.toString(),
+                     val request = CreateClientRequest(
+                        nombre = nameEditText.text.toString(),
+                        direccion = addressEditText.text.toString(),
+                        telefono = phoneEditText.text.toString(),
                         email = emailEditText.text.toString(),
-                        representative = representativeEditText.text.toString()
+                        representante = representativeEditText.text.toString()
                     )
                     viewModel.createClient(request)
                 }

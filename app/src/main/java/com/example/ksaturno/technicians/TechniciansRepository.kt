@@ -62,7 +62,7 @@ class TechniciansRepository(private val apiService: ApiService) {
      */
     suspend fun updateTechnician(technician: Technician): ApiResponse {
         return withContext(Dispatchers.IO) {
-            val response = apiService.updateTechnician(technician.id, technician)
+            val response = apiService.updateTechnician(technician.idTecnico, technician)
             if (response.isSuccessful) {
                 ApiResponse(true, response.body()?.message ?: "Técnico actualizado exitosamente")
             } else {

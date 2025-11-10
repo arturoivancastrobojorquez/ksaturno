@@ -2,14 +2,10 @@ package com.example.ksaturno.units
 
 import com.example.ksaturno.ApiService
 import com.example.ksaturno.ApiResponse
-import com.example.ksaturno.categories.Category
-import com.example.ksaturno.categories.CategoriesRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
 class UnitsRepository(private val apiService: ApiService) {
-
-    private val categoriesRepository = CategoriesRepository(apiService)
 
     suspend fun getUnits(): List<Unit> {
         return withContext(Dispatchers.IO) {
@@ -17,20 +13,28 @@ class UnitsRepository(private val apiService: ApiService) {
             if (response.isSuccessful) {
                 response.body() ?: emptyList()
             } else {
-                throw Exception("Error al obtener unidades: ${response.code()}")
+                emptyList()
             }
         }
     }
 
-    suspend fun getCategories(): List<Category> {
-        return categoriesRepository.getCategories()
+    suspend fun getUnitsByClient(clientId: Int): List<Unit> {
+        return withContext(Dispatchers.IO) {
+            val response = apiService.getUnitsByClient(clientId)
+            if (response.isSuccessful) {
+                response.body() ?: emptyList()
+            } else {
+                // Handle error, maybe return an empty list or throw an exception
+                emptyList()
+            }
+        }
     }
 
-    suspend fun createUnit(unitRequest: CreateUnitRequest): ApiResponse {
+    suspend fun createUnit(request: CreateUnitRequest): ApiResponse {
         return withContext(Dispatchers.IO) {
-            val response = apiService.createUnit(unitRequest)
+            val response = apiService.createUnit(request)
             if (response.isSuccessful) {
-                ApiResponse(true, response.body()?.message ?: "Unidad creada exitosamente")
+                ApiResponse(true, "Unidad creada exitosamente")
             } else {
                 ApiResponse(false, "Error al crear la unidad")
             }
@@ -39,9 +43,9 @@ class UnitsRepository(private val apiService: ApiService) {
 
     suspend fun updateUnit(unit: Unit): ApiResponse {
         return withContext(Dispatchers.IO) {
-            val response = apiService.updateUnit(unit.id, unit)
+            val response = apiService.updateUnit(unit.idUnidad, unit)
             if (response.isSuccessful) {
-                ApiResponse(true, response.body()?.message ?: "Unidad actualizada exitosamente")
+                ApiResponse(true, "Unidad actualizada exitosamente")
             } else {
                 ApiResponse(false, "Error al actualizar la unidad")
             }
@@ -52,7 +56,7 @@ class UnitsRepository(private val apiService: ApiService) {
         return withContext(Dispatchers.IO) {
             val response = apiService.deleteUnit(UnitIdBody(id))
             if (response.isSuccessful) {
-                ApiResponse(true, response.body()?.message ?: "Unidad eliminada exitosamente")
+                ApiResponse(true, "Unidad eliminada exitosamente")
             } else {
                 ApiResponse(false, "Error al eliminar la unidad")
             }

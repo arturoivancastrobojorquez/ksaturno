@@ -7,7 +7,7 @@ import android.view.ViewGroup
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.widget.SearchView
-import androidx.fragment.app.Fragment
+import androidx.fragment.app.DialogFragment // Changed from Fragment to DialogFragment
 import androidx.fragment.app.setFragmentResult
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -15,7 +15,8 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.ksaturno.R
 import com.example.ksaturno.RetrofitClient
 
-class ClientSearchFragment : Fragment() {
+// Inherit from DialogFragment instead of Fragment
+class ClientSearchFragment : DialogFragment() {
 
     private lateinit var viewModel: ClientSearchViewModel
     private lateinit var clientSearchAdapter: ClientSearchAdapter
@@ -37,10 +38,11 @@ class ClientSearchFragment : Fragment() {
         clientSearchAdapter = ClientSearchAdapter(emptyList()) { selectedClient ->
             val result = Bundle().apply {
                 putInt("selectedClientId", selectedClient.id)
-                putString("selectedClientName", selectedClient.name)
+                putString("selectedClientName", selectedClient.nombre)
             }
             setFragmentResult("clientSearchRequest", result)
-            parentFragmentManager.popBackStack()
+            // When it's a dialog, we dismiss it instead of popping the back stack
+            dismiss()
         }
 
         recyclerView.adapter = clientSearchAdapter
@@ -62,8 +64,7 @@ class ClientSearchFragment : Fragment() {
 
             override fun onQueryTextChange(newText: String?): Boolean {
                 val filteredList = allClients.filter { client ->
-                    // Safe filter: only include clients with a non-null name that contains the search text
-                    client.name?.contains(newText ?: "", ignoreCase = true) ?: false
+                    client.nombre?.contains(newText ?: "", ignoreCase = true) ?: false
                 }
                 clientSearchAdapter.updateClients(filteredList)
                 return true
@@ -71,6 +72,12 @@ class ClientSearchFragment : Fragment() {
         })
 
         return view
+    }
+
+    override fun onStart() {
+        super.onStart()
+        // Optional: Make the dialog fill the screen width
+        dialog?.window?.setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT)
     }
 }
 
@@ -99,7 +106,7 @@ class ClientSearchAdapter(
         private val nameTextView: TextView = itemView.findViewById(R.id.text_view_client_name)
 
         fun bind(client: Client) {
-            nameTextView.text = client.name ?: "(Nombre no disponible)"
+            nameTextView.text = client.nombre ?: "(Nombre no disponible)"
             itemView.setOnClickListener { onClientSelected(client) }
         }
     }
