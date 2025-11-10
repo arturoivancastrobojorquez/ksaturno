@@ -7,182 +7,128 @@ import android.view.ViewGroup
 import android.widget.ArrayAdapter
 import android.widget.EditText
 import android.widget.Spinner
-import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
-import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.setFragmentResultListener
 import androidx.lifecycle.ViewModelProvider
+import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.ksaturno.R
-import com.example.ksaturno.RetrofitClient
-import com.example.ksaturno.clients.ClientSearchFragment
+import com.example.ksaturno.clients.Client
 import com.google.android.material.floatingactionbutton.FloatingActionButton
-import java.text.SimpleDateFormat
-import java.util.Date
-import java.util.Locale
+// Import the class with an alias to avoid the name collision with kotlin.Unit
+import com.example.ksaturno.units.Unit as DomainUnit
 
 class UnitsFragment : Fragment() {
 
     private lateinit var viewModel: UnitsViewModel
-    private lateinit var unitsAdapter: UnitsAdapter
-    private var selectedClientId: Int? = null
-    private var selectedClientName: String? = null
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
         val view = inflater.inflate(R.layout.fragment_units, container, false)
-
-        val repository = UnitsRepository(RetrofitClient.instance)
-        val factory = UnitsViewModelFactory(repository)
-        viewModel = ViewModelProvider(this, factory).get(UnitsViewModel::class.java)
+        viewModel = ViewModelProvider(this).get(UnitsViewModel::class.java)
 
         val recyclerView: RecyclerView = view.findViewById(R.id.recycler_view_units)
-        unitsAdapter = UnitsAdapter(emptyList(), { onEditUnit(it) }, { onDeleteUnit(it) })
-        recyclerView.adapter = unitsAdapter
+        val adapter = UnitsAdapter(emptyList(), ::onEditUnit, ::onDeleteUnit)
+        recyclerView.layoutManager = LinearLayoutManager(requireContext())
+        recyclerView.adapter = adapter
 
         viewModel.units.observe(viewLifecycleOwner) {
-            unitsAdapter.updateUnits(it)
+            adapter.updateUnits(it)
         }
 
-        viewModel.toastMessage.observe(viewLifecycleOwner) { message ->
-            if (!message.isNullOrBlank()) {
-                Toast.makeText(requireContext(), message, Toast.LENGTH_SHORT).show()
-            }
+        viewModel.toastMessage.observe(viewLifecycleOwner) {
+            Toast.makeText(requireContext(), it, Toast.LENGTH_SHORT).show()
         }
 
-        val fab: FloatingActionButton = view.findViewById(R.id.fab_add_unit)
-        fab.setOnClickListener {
-            selectedClientId = null
-            selectedClientName = null
-            showAddOrEditUnitDialog(null)
-        }
-
-        setFragmentResultListener("clientSearchRequest") { _, bundle ->
-            selectedClientId = bundle.getInt("selectedClientId")
-            selectedClientName = bundle.getString("selectedClientName")
+        view.findViewById<FloatingActionButton>(R.id.fab_add_unit).setOnClickListener {
             showAddOrEditUnitDialog(null)
         }
 
         return view
     }
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
-        (activity as? AppCompatActivity)?.supportActionBar?.title = "Unidades"
-    }
-
-    private fun onEditUnit(unit: Unit) {
-        selectedClientId = unit.clientId
-        // We would need the client name here from the unit object if available
-        // selectedClientName = unit.clientName 
+    private fun onEditUnit(unit: DomainUnit) {
         showAddOrEditUnitDialog(unit)
     }
 
-    private fun onDeleteUnit(unit: Unit) {
+    private fun onDeleteUnit(unit: DomainUnit) {
         AlertDialog.Builder(requireContext())
             .setTitle("Eliminar Unidad")
             .setMessage("¿Estás seguro de que deseas eliminar esta unidad?")
-            .setPositiveButton("Eliminar") { _, _ -> viewModel.deleteUnit(unit) }
-            .setNegativeButton("Cancelar", null)
+            .setPositiveButton("Sí") { _, _ -> viewModel.deleteUnit(unit.idUnidad) }
+            .setNegativeButton("No", null)
             .show()
     }
 
-    private fun showAddOrEditUnitDialog(unit: Unit?) {
-        val context = requireContext()
+    private fun showAddOrEditUnitDialog(unit: DomainUnit?) {
         val isEditMode = unit != null
+        val dialogView = LayoutInflater.from(requireContext()).inflate(R.layout.dialog_add_unit, null)
 
-        val dialogView = LayoutInflater.from(context).inflate(R.layout.dialog_add_unit, null)
-        val selectClientTextView: TextView = dialogView.findViewById(R.id.text_view_select_client)
-
-        val dialog = AlertDialog.Builder(context)
-            .setTitle(if (isEditMode) "Editar Unidad" else "Nueva Unidad")
-            .setView(dialogView)
-            .setPositiveButton("Guardar", null)
-            .setNegativeButton("Cancelar", null)
-            .create()
-
-        selectClientTextView.setOnClickListener {
-            dialog.dismiss()
-            parentFragmentManager.beginTransaction()
-                .replace(R.id.fragmentContainer, ClientSearchFragment())
-                .addToBackStack(null)
-                .commit()
-        }
-
-        if (selectedClientName != null) {
-            selectClientTextView.text = selectedClientName
-        }
-
+        val clientSpinner: Spinner = dialogView.findViewById(R.id.spinner_client)
         val nameEditText: EditText = dialogView.findViewById(R.id.edit_text_unit_name)
-        val categorySpinner: Spinner = dialogView.findViewById(R.id.spinner_category)
+        val installDateEditText: EditText = dialogView.findViewById(R.id.edit_text_install_date)
         val simCardEditText: EditText = dialogView.findViewById(R.id.edit_text_sim_card)
-        val statusEditText: EditText = dialogView.findViewById(R.id.edit_text_status)
         val commentsEditText: EditText = dialogView.findViewById(R.id.edit_text_comments)
+        val statusEditText: EditText = dialogView.findViewById(R.id.edit_text_status)
 
-        val categoryAdapter = ArrayAdapter<String>(context, android.R.layout.simple_spinner_item, mutableListOf("Cargando..."))
-        categoryAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
-        categorySpinner.adapter = categoryAdapter
+        viewModel.clients.observe(viewLifecycleOwner) {
+            val adapter = ArrayAdapter(requireContext(), android.R.layout.simple_spinner_item, it)
+            clientSpinner.adapter = adapter
 
-        viewModel.categories.observe(viewLifecycleOwner) { categories ->
-            val categoryNames = categories.map { it.nombre }
-            categoryAdapter.clear()
-            categoryAdapter.addAll(categoryNames)
-            categoryAdapter.notifyDataSetChanged()
             if (isEditMode) {
-                val categoryPosition = categories.indexOfFirst { it.id == unit?.categoryId }
-                if (categoryPosition != -1) categorySpinner.setSelection(categoryPosition)
+                val clientPosition = it.indexOfFirst { client -> client.id == unit?.idCliente }
+                clientSpinner.setSelection(clientPosition)
             }
         }
 
         if (isEditMode) {
-            nameEditText.setText(unit?.name)
-            simCardEditText.setText(unit?.simCard)
-            statusEditText.setText(unit?.status)
-            commentsEditText.setText(unit?.comments)
-            if (selectedClientName != null) {
-                selectClientTextView.text = selectedClientName
-            } else {
-                 selectClientTextView.text = "Cliente ID: ${unit?.clientId}"
-            }
+            nameEditText.setText(unit?.nombreUnidad)
+            installDateEditText.setText(unit?.fechaInstalacion)
+            simCardEditText.setText(unit?.tarjetaSim)
+            commentsEditText.setText(unit?.comentarios)
+            statusEditText.setText(unit?.estatus)
         }
-        
-        dialog.show()
-        
-        dialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener { 
-            val name = nameEditText.text.toString()
-            val simCard = simCardEditText.text.toString()
-            val status = statusEditText.text.toString()
-            val comments = commentsEditText.text.toString()
 
-            val selectedCategoryPosition = categorySpinner.selectedItemPosition
-            val selectedCategory = viewModel.categories.value?.getOrNull(selectedCategoryPosition)
-
-            if (name.isNotBlank() && selectedCategory != null && selectedClientId != null) {
-                val dateFormat = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault())
-                val currentDate = dateFormat.format(Date())
+        AlertDialog.Builder(requireContext())
+            .setTitle(if (isEditMode) "Editar Unidad" else "Agregar Unidad")
+            .setView(dialogView)
+            .setPositiveButton("Guardar") { _, _ ->
+                val selectedClient = clientSpinner.selectedItem as Client
+                val unitName = nameEditText.text.toString()
+                val installDate = installDateEditText.text.toString()
+                val simCard = simCardEditText.text.toString()
+                val comments = commentsEditText.text.toString()
+                val status = statusEditText.text.toString()
 
                 if (isEditMode) {
                     val updatedUnit = unit!!.copy(
-                        name = name, clientId = selectedClientId!!, categoryId = selectedCategory.id,
-                        simCard = simCard, status = status, comments = comments
+                        idCliente = selectedClient.id,
+                        nombreUnidad = unitName,
+                        fechaInstalacion = installDate,
+                        tarjetaSim = simCard,
+                        comentarios = comments,
+                        estatus = status,
+                        ultimaFechaInstalacion = unit.ultimaFechaInstalacion // Preserve this field
                     )
                     viewModel.updateUnit(updatedUnit)
                 } else {
                     val newUnit = CreateUnitRequest(
-                        name = name, clientId = selectedClientId!!, categoryId = selectedCategory.id,
-                        installDate = currentDate, lastInstallDate = currentDate, comments = comments,
-                        status = status, simCard = simCard
+                        idCliente = selectedClient.id,
+                        nombreUnidad = unitName,
+                        fechaInstalacion = installDate,
+                        ultimaFechaInstalacion = null, // Pass null for a new unit
+                        comentarios = comments,
+                        estatus = status,
+                        tarjetaSim = simCard,
+                        categoryId = 1 // TODO: Reemplazar con ID de categoría real
                     )
                     viewModel.createUnit(newUnit)
                 }
-                dialog.dismiss()
-            } else {
-                Toast.makeText(context, "Nombre, cliente y categoría son obligatorios", Toast.LENGTH_SHORT).show()
             }
-        }
+            .setNegativeButton("Cancelar", null)
+            .show()
     }
 }

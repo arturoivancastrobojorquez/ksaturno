@@ -9,4 +9,7 @@
     <item
         android:id="@+id/pending_verifications"
         android:title="Verificaciones pendientes" />
+    <item
+        android:id="@+id/checklist_items"
+        android:title="Lista de Verificación" />
 </menu>
