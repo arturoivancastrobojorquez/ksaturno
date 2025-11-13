@@ -31,7 +31,8 @@ class ChecklistViewModel(private val repository: ChecklistRepository) : ViewMode
     fun fetchChecklistItems() {
         viewModelScope.launch {
             try {
-                val result = repository.getChecklistItems()
+                // Corrected method name to match the one in the repository
+                val result = repository.getMasterChecklistItems()
                 _checklistItems.postValue(result)
             } catch (e: Exception) {
                 _toastMessage.postValue(e.message)

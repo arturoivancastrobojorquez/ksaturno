@@ -44,7 +44,8 @@ class InstalacionesFragment : Fragment() {
         }
 
         binding.fabAddInstalacion.setOnClickListener {
-            findNavController().navigate(R.id.action_installations_to_form)
+            // Use the correct action ID to navigate to the first step of the wizard
+            findNavController().navigate(R.id.action_new_installation_to_step1)
         }
 
         // No need to call fetchInstalaciones() here if it's called in the init block of the ViewModel

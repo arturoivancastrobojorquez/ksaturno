@@ -1,6 +1,9 @@
 package com.example.ksaturno
 
+import com.google.gson.annotations.SerializedName
+
 data class ApiResponse(
-    val success: Boolean,
-    val message: String
+    @SerializedName("success") val success: Boolean,
+    @SerializedName("message") val message: String,
+    @SerializedName("id") val newId: Int? = null // Optional field to hold the new ID
 )

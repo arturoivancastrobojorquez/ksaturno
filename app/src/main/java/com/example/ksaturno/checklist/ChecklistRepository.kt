@@ -5,19 +5,15 @@ import com.example.ksaturno.ApiResponse
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
-/**
- * REPOSITORIO: Abstrae el origen de los datos de la lista de verificación.
- * Es el único que sabe que los datos vienen de una API remota (ApiService).
- */
 class ChecklistRepository(private val apiService: ApiService) {
 
-    suspend fun getChecklistItems(): List<ChecklistItem> {
+    suspend fun getMasterChecklistItems(): List<ChecklistItem> {
         return withContext(Dispatchers.IO) {
             val response = apiService.getChecklistItems()
             if (response.isSuccessful) {
-                response.body() ?: throw Exception("Error de parsing: El cuerpo de la respuesta es nulo.")
+                response.body() ?: emptyList()
             } else {
-                throw Exception("Error al obtener los ítems: ${response.code()}")
+                throw Exception("Error fetching master checklist: ${response.code()}")
             }
         }
     }
@@ -25,32 +21,31 @@ class ChecklistRepository(private val apiService: ApiService) {
     suspend fun createChecklistItem(request: CreateChecklistItemRequest): ApiResponse {
         return withContext(Dispatchers.IO) {
             val response = apiService.createChecklistItem(request)
-            if (response.isSuccessful) {
-                ApiResponse(true, response.body()?.message ?: "Ítem creado exitosamente")
-            } else {
-                ApiResponse(false, "Error al crear el ítem")
-            }
+            if (response.isSuccessful && response.body() != null) response.body()!! else ApiResponse(false, "Error: ${response.code()}")
         }
     }
 
     suspend fun updateChecklistItem(item: ChecklistItem): ApiResponse {
         return withContext(Dispatchers.IO) {
             val response = apiService.updateChecklistItem(item.id, item)
-            if (response.isSuccessful) {
-                ApiResponse(true, response.body()?.message ?: "Ítem actualizado exitosamente")
-            } else {
-                ApiResponse(false, "Error al actualizar el ítem")
-            }
+            if (response.isSuccessful && response.body() != null) response.body()!! else ApiResponse(false, "Error: ${response.code()}")
         }
     }
 
-    suspend fun deleteChecklistItem(id: Int): ApiResponse {
+    suspend fun deleteChecklistItem(itemId: Int): ApiResponse {
         return withContext(Dispatchers.IO) {
-            val response = apiService.deleteChecklistItem(ChecklistItemIdBody(id))
-            if (response.isSuccessful) {
-                ApiResponse(true, response.body()?.message ?: "Ítem eliminado exitosamente")
+            val response = apiService.deleteChecklistItem(ChecklistItemIdBody(itemId))
+            if (response.isSuccessful && response.body() != null) response.body()!! else ApiResponse(false, "Error: ${response.code()}")
+        }
+    }
+
+    suspend fun saveChecklistItemState(request: CreateListaVerificacionRequest): ApiResponse {
+        return withContext(Dispatchers.IO) {
+            val response = apiService.saveChecklistItem(request)
+            if (response.isSuccessful && response.body() != null) {
+                response.body()!!
             } else {
-                ApiResponse(false, "Error al eliminar el ítem")
+                ApiResponse(false, "Error de red: ${response.code()}", null)
             }
         }
     }

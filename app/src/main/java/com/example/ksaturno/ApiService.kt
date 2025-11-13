@@ -5,10 +5,13 @@ import com.example.ksaturno.categories.CategoryIdBody
 import com.example.ksaturno.categories.CreateCategoryRequest
 import com.example.ksaturno.checklist.ChecklistItem
 import com.example.ksaturno.checklist.ChecklistItemIdBody
+import com.example.ksaturno.checklist.CompletedChecklistItem
 import com.example.ksaturno.checklist.CreateChecklistItemRequest
+import com.example.ksaturno.checklist.CreateListaVerificacionRequest
 import com.example.ksaturno.clients.Client
 import com.example.ksaturno.clients.ClientIdBody
 import com.example.ksaturno.clients.CreateClientRequest
+import com.example.ksaturno.evidencias.CreateEvidenciaRequest
 import com.example.ksaturno.instalaciones.CreateInstalacionRequest
 import com.example.ksaturno.instalaciones.Instalacion
 import com.example.ksaturno.instalaciones.InstalacionIdBody
@@ -110,13 +113,13 @@ interface ApiService {
     @POST("servicios/grabar.php")
     suspend fun createServicio(@Body request: CreateServicioRequest): Response<ApiResponse>
 
-    @PUT("servicios/actualizar.php/{id}")
-    suspend fun updateServicio(@Path("id") id: Int, @Body servicio: Servicio): Response<ApiResponse>
+    @PUT("servicios/actualizar.php")
+    suspend fun updateServicio(@Query("id") id: Int, @Body servicio: Servicio): Response<ApiResponse>
 
     @HTTP(method = "DELETE", path = "servicios/eliminar.php", hasBody = true)
     suspend fun deleteServicio(@Body body: ServicioIdBody): Response<ApiResponse>
 
-    // Instalaciones
+    // Installation Flow
     @GET("instalaciones/listar.php")
     suspend fun getInstalaciones(): Response<List<Instalacion>>
 
@@ -128,4 +131,13 @@ interface ApiService {
 
     @HTTP(method = "DELETE", path = "instalaciones/eliminar.php", hasBody = true)
     suspend fun deleteInstalacion(@Body body: InstalacionIdBody): Response<ApiResponse>
+
+    @POST("listas_verificacion_instalacion/grabar.php")
+    suspend fun saveChecklistItem(@Body request: CreateListaVerificacionRequest): Response<ApiResponse>
+
+    @GET("instalaciones/evidencias_pendientes.php")
+    suspend fun getEvidencePendingItems(@Query("id_instalacion") installationId: Int): Response<List<CompletedChecklistItem>>
+
+    @POST("evidencias/grabar.php")
+    suspend fun saveEvidence(@Body request: CreateEvidenciaRequest): Response<ApiResponse>
 }

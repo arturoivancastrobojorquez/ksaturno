@@ -4,8 +4,6 @@
     android:orientation="vertical"
     android:padding="16dp">
 
-    <!-- The Unit spinner has been removed. -->
-
     <Spinner
         android:id="@+id/spinner_servicio"
         android:layout_width="match_parent"
@@ -25,7 +23,8 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:hint="Fecha de Instalación (YYYY-MM-DD)"
-        android:inputType="date"
+        android:focusable="false"
+        android:clickable="true"
         android:minHeight="48dp"
         android:layout_marginBottom="8dp" />
 
@@ -54,10 +53,10 @@
         android:layout_marginBottom="16dp" />
 
     <Button
-        android:id="@+id/btn_guardar_instalacion"
+        android:id="@+id/btn_next_step"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Guardar"
+        android:text="Siguiente"
         android:layout_gravity="center_horizontal"/>
 
 </LinearLayout>

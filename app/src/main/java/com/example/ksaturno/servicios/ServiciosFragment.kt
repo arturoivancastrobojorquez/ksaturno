@@ -84,9 +84,8 @@ class ServiciosFragment : Fragment() {
     private fun showAddOrEditServicioDialog(servicio: Servicio?) {
         val isEditMode = servicio != null
         val dialogView = LayoutInflater.from(requireContext()).inflate(R.layout.dialog_add_servicio, null)
-        var dialog: AlertDialog? = null // Hold a reference to dismiss it later
+        var dialog: AlertDialog? = null
 
-        // --- Get all view references ---
         val selectClientTextView: TextView = dialogView.findViewById(R.id.text_view_select_client_for_service)
         val unitSpinner: Spinner = dialogView.findViewById(R.id.spinner_unit_for_service)
         val typeSpinner: Spinner = dialogView.findViewById(R.id.spinner_service_type)
@@ -97,10 +96,10 @@ class ServiciosFragment : Fragment() {
         val dueDateEditText: EditText = dialogView.findViewById(R.id.edit_text_service_due_date)
         val amountEditText: EditText = dialogView.findViewById(R.id.edit_text_service_amount)
         val simCardEditText: EditText = dialogView.findViewById(R.id.edit_text_sim_card)
+        val iccidEditText: EditText = dialogView.findViewById(R.id.edit_text_iccid)
         val numPeriodsEditText: EditText = dialogView.findViewById(R.id.edit_text_num_periods)
         val commentsEditText: EditText = dialogView.findViewById(R.id.edit_text_service_comments)
 
-        // --- Setup Adapters for Spinners ---
         val serviceTypes = listOf("renovacion", "instalacion", "mantenimiento", "otro")
         val serviceStatus = listOf("vencido", "pendiente", "pagado")
         val paymentPeriods = listOf("anual", "semestral", "bimestral", "mensual")
@@ -112,9 +111,9 @@ class ServiciosFragment : Fragment() {
         val unitAdapter = ArrayAdapter(requireContext(), android.R.layout.simple_spinner_item, mutableListOf<Unit>()).also { it.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item) }
         unitSpinner.adapter = unitAdapter
 
-        // --- UI Observers & Listeners ---
         val displayFormat = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
         val apiFormat = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
+        val currencyFormat = NumberFormat.getCurrencyInstance()
         val startDateCalendar = Calendar.getInstance()
         val endDateCalendar = Calendar.getInstance()
         val dueDateCalendar = Calendar.getInstance()
@@ -146,15 +145,18 @@ class ServiciosFragment : Fragment() {
 
         selectClientTextView.setOnClickListener { findNavController().navigate(R.id.clientSearchFragment) }
 
-        viewModel.selectedClient.observe(viewLifecycleOwner) { client -> selectClientTextView.text = client?.nombre ?: "Seleccionar cliente..." }
+        viewModel.selectedClient.observe(viewLifecycleOwner) { client ->
+            selectClientTextView.text = client?.nombre ?: "Seleccionar cliente..."
+        }
+
         viewModel.filteredUnits.observe(viewLifecycleOwner) {
             unitAdapter.clear(); unitAdapter.addAll(it); unitAdapter.notifyDataSetChanged()
             if (isEditMode) {
                 val unitPos = it.indexOfFirst { unit -> unit.idUnidad == servicio?.idUnidad }; if (unitPos >= 0) unitSpinner.setSelection(unitPos)
             }
         }
-
-        fun parseDate(dateString: String?): Date? = if (dateString.isNullOrBlank()) null else try { apiFormat.parse(dateString) } catch (e: ParseException) { null }
+        
+        fun parseDate(dateString: String?): Date? = if (dateString.isNullOrEmpty()) null else try { apiFormat.parse(dateString) } catch (e: ParseException) { null }
 
         if (isEditMode) {
             typeSpinner.setSelection(serviceTypes.indexOf(servicio?.tipo).coerceAtLeast(0))
@@ -163,11 +165,13 @@ class ServiciosFragment : Fragment() {
             parseDate(servicio?.fechaInicio)?.let { startDateCalendar.time = it; startDateEditText.setText(displayFormat.format(it)) }
             parseDate(servicio?.fechaFin)?.let { endDateCalendar.time = it; endDateEditText.setText(displayFormat.format(it)) }
             parseDate(servicio?.fechaVencimiento)?.let { dueDateCalendar.time = it; dueDateEditText.setText(displayFormat.format(it)) }
-            amountEditText.setText(NumberFormat.getCurrencyInstance().format(servicio?.monto ?: 0.0))
-            simCardEditText.setText(servicio?.tarjetaSim); numPeriodsEditText.setText(servicio?.numPeriodos?.toString() ?: ""); commentsEditText.setText(servicio?.comentarios)
+            amountEditText.setText(currencyFormat.format(servicio?.monto ?: 0.0))
+            simCardEditText.setText(servicio?.tarjetaSim)
+            iccidEditText.setText(servicio?.iccid)
+            numPeriodsEditText.setText(servicio?.numPeriodos?.toString() ?: "")
+            commentsEditText.setText(servicio?.comentarios)
         }
 
-        // --- Dialog Creation and Final Logic ---
         dialog = AlertDialog.Builder(requireContext())
             .setTitle(if (isEditMode) "Editar Servicio" else "Agregar Servicio")
             .setView(dialogView)
@@ -182,26 +186,37 @@ class ServiciosFragment : Fragment() {
         dialog.setOnShowListener { 
             val positiveButton = dialog.getButton(AlertDialog.BUTTON_POSITIVE)
             positiveButton.setOnClickListener { 
-                val selectedUnit = unitSpinner.selectedItem as? Unit
                 if (viewModel.selectedClient.value == null && !isEditMode) { Toast.makeText(context, "Por favor, selecciona un cliente", Toast.LENGTH_SHORT).show(); return@setOnClickListener }
+
+                val selectedUnit = unitSpinner.selectedItem as? Unit
                 if (selectedUnit == null) { Toast.makeText(context, "Por favor, selecciona una unidad", Toast.LENGTH_SHORT).show(); return@setOnClickListener }
                 if (startDateEditText.text.isBlank()) { Toast.makeText(context, "Por favor, selecciona una fecha de inicio", Toast.LENGTH_SHORT).show(); return@setOnClickListener }
                 val amountText = amountEditText.text.toString().replace(Regex("[$,]"), ""); val amount = amountText.toDoubleOrNull()
                 if (amount == null || amount <= 0.0) { Toast.makeText(context, "Por favor, ingresa un monto válido", Toast.LENGTH_SHORT).show(); return@setOnClickListener }
 
+                val selectedType = typeSpinner.selectedItem as String
+                val selectedStatus = statusSpinner.selectedItem as String
+                val selectedPaymentPeriod = paymentPeriodSpinner.selectedItem as String
+                val numPeriods = numPeriodsEditText.text.toString().toIntOrNull()
+                val simCard = simCardEditText.text.toString()
+                val iccid = iccidEditText.text.toString()
+                val comments = commentsEditText.text.toString()
+
                 if (isEditMode) {
                     val updatedServicio = servicio!!.copy(
-                        idUnidad = selectedUnit.idUnidad, tipo = typeSpinner.selectedItem.toString(), fechaInicio = apiFormat.format(startDateCalendar.time),
+                        idUnidad = selectedUnit.idUnidad, tipo = selectedType, fechaInicio = apiFormat.format(startDateCalendar.time),
                         fechaFin = if(endDateEditText.text.isNotBlank()) apiFormat.format(endDateCalendar.time) else null, fechaVencimiento = if(dueDateEditText.text.isNotBlank()) apiFormat.format(dueDateCalendar.time) else null,
-                        monto = amount, estado = statusSpinner.selectedItem.toString(), numPeriodos = numPeriodsEditText.text.toString().toIntOrNull(), 
-                        comentarios = commentsEditText.text.toString(), periodoPago = paymentPeriodSpinner.selectedItem.toString(), tarjetaSim = simCardEditText.text.toString().ifBlank { null })
+                        monto = amount, estado = selectedStatus, numPeriodos = numPeriods, 
+                        comentarios = comments, periodoPago = selectedPaymentPeriod, 
+                        tarjetaSim = simCard.ifBlank { null }, iccid = iccid.ifBlank { null })
                     viewModel.updateServicio(updatedServicio)
                 } else {
                     val newServicio = CreateServicioRequest(
-                        idUnidad = selectedUnit.idUnidad, tipo = typeSpinner.selectedItem.toString(), fechaInicio = apiFormat.format(startDateCalendar.time),
+                        idUnidad = selectedUnit.idUnidad, tipo = selectedType, fechaInicio = apiFormat.format(startDateCalendar.time),
                         fechaFin = if(endDateEditText.text.isNotBlank()) apiFormat.format(endDateCalendar.time) else null, fechaVencimiento = if(dueDateEditText.text.isNotBlank()) apiFormat.format(dueDateCalendar.time) else null,
-                        monto = amount, estado = statusSpinner.selectedItem.toString(), numPeriodos = numPeriodsEditText.text.toString().toIntOrNull(), 
-                        comentarios = commentsEditText.text.toString(), idFactura = null, periodoPago = paymentPeriodSpinner.selectedItem.toString(), tarjetaSim = simCardEditText.text.toString().ifBlank { null })
+                        monto = amount, estado = selectedStatus, numPeriodos = numPeriods, 
+                        comentarios = comments, idFactura = null, periodoPago = selectedPaymentPeriod, 
+                        tarjetaSim = simCard.ifBlank { null }, iccid = iccid.ifBlank { null })
                     viewModel.createServicio(newServicio)
                 }
             }

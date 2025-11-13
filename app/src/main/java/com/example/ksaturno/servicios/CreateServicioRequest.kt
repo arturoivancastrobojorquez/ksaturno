@@ -14,5 +14,6 @@ data class CreateServicioRequest(
     @SerializedName("comentarios") val comentarios: String?,
     @SerializedName("id_factura") val idFactura: Int?,
     @SerializedName("periodo_pago") val periodoPago: String,
-    @SerializedName("tarjeta_sim") val tarjetaSim: String?
+    @SerializedName("tarjeta_sim") val tarjetaSim: String?,
+    @SerializedName("iccid") val iccid: String? // New field
 )

@@ -13,7 +13,7 @@ class UnitsRepository(private val apiService: ApiService) {
             if (response.isSuccessful) {
                 response.body() ?: emptyList()
             } else {
-                emptyList()
+                throw Exception("Error al obtener unidades: ${response.code()}")
             }
         }
     }
@@ -24,41 +24,53 @@ class UnitsRepository(private val apiService: ApiService) {
             if (response.isSuccessful) {
                 response.body() ?: emptyList()
             } else {
-                // Handle error, maybe return an empty list or throw an exception
-                emptyList()
+                throw Exception("Error al obtener unidades por cliente: ${response.code()}")
             }
         }
     }
 
     suspend fun createUnit(request: CreateUnitRequest): ApiResponse {
         return withContext(Dispatchers.IO) {
-            val response = apiService.createUnit(request)
-            if (response.isSuccessful) {
-                ApiResponse(true, "Unidad creada exitosamente")
-            } else {
-                ApiResponse(false, "Error al crear la unidad")
+            try {
+                val response = apiService.createUnit(request)
+                // Now we correctly check the body of the response, not just the HTTP code
+                if (response.isSuccessful && response.body() != null) {
+                    response.body()!!
+                } else {
+                    ApiResponse(false, "Error de red: ${response.code()}")
+                }
+            } catch (e: Exception) {
+                ApiResponse(false, "Excepción de red: ${e.message}")
             }
         }
     }
 
     suspend fun updateUnit(unit: Unit): ApiResponse {
         return withContext(Dispatchers.IO) {
-            val response = apiService.updateUnit(unit.idUnidad, unit)
-            if (response.isSuccessful) {
-                ApiResponse(true, "Unidad actualizada exitosamente")
-            } else {
-                ApiResponse(false, "Error al actualizar la unidad")
+            try {
+                val response = apiService.updateUnit(unit.idUnidad, unit)
+                if (response.isSuccessful && response.body() != null) {
+                    response.body()!!
+                } else {
+                    ApiResponse(false, "Error de red: ${response.code()}")
+                }
+            } catch (e: Exception) {
+                ApiResponse(false, "Excepción de red: ${e.message}")
             }
         }
     }
 
     suspend fun deleteUnit(id: Int): ApiResponse {
         return withContext(Dispatchers.IO) {
-            val response = apiService.deleteUnit(UnitIdBody(id))
-            if (response.isSuccessful) {
-                ApiResponse(true, "Unidad eliminada exitosamente")
-            } else {
-                ApiResponse(false, "Error al eliminar la unidad")
+            try {
+                val response = apiService.deleteUnit(UnitIdBody(id))
+                if (response.isSuccessful && response.body() != null) {
+                    response.body()!!
+                } else {
+                    ApiResponse(false, "Error de red: ${response.code()}")
+                }
+            } catch (e: Exception) {
+                ApiResponse(false, "Excepción de red: ${e.message}")
             }
         }
     }

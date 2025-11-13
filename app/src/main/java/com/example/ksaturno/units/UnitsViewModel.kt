@@ -1,91 +1,145 @@
 package com.example.ksaturno.units
 
+import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.ksaturno.ApiResponse
 import com.example.ksaturno.RetrofitClient
+import com.example.ksaturno.categories.CategoriesRepository
+import com.example.ksaturno.categories.Category
 import com.example.ksaturno.clients.Client
 import com.example.ksaturno.clients.ClientsRepository
 import kotlinx.coroutines.launch
 
 class UnitsViewModel : ViewModel() {
 
+    private val repository = UnitsRepository(RetrofitClient.instance)
+    private val clientsRepository = ClientsRepository(RetrofitClient.instance)
+    private val categoriesRepository = CategoriesRepository(RetrofitClient.instance)
+
     private val _units = MutableLiveData<List<Unit>>()
     val units: LiveData<List<Unit>> get() = _units
 
-    private val _clients = MutableLiveData<List<Client>>()
-    val clients: LiveData<List<Client>> get() = _clients
+    private val _allClients = MutableLiveData<List<Client>>()
 
-    private val _toastMessage = MutableLiveData<String>()
-    val toastMessage: LiveData<String> get() = _toastMessage
+    private val _categories = MutableLiveData<List<Category>>()
+    val categories: LiveData<List<Category>> get() = _categories
 
-    private val repository = UnitsRepository(RetrofitClient.instance)
-    private val clientsRepository = ClientsRepository(RetrofitClient.instance)
+    private val _selectedClient = MutableLiveData<Client?>()
+    val selectedClient: LiveData<Client?> get() = _selectedClient
+
+    private val _errorMessage = MutableLiveData<String?>()
+    val errorMessage: LiveData<String?> get() = _errorMessage
+
+    private val _successMessage = MutableLiveData<String?>()
+    val successMessage: LiveData<String?> get() = _successMessage
 
     init {
         fetchUnits()
-        fetchClients()
+        fetchAllClients()
+        fetchCategories()
     }
 
-    private fun fetchUnits() {
+    fun fetchUnits() {
         viewModelScope.launch {
             try {
                 _units.value = repository.getUnits()
             } catch (e: Exception) {
-                _toastMessage.value = "Error al cargar unidades"
+                handleError("Error al cargar unidades", e)
             }
         }
     }
 
-    private fun fetchClients() {
+    private fun fetchAllClients() {
         viewModelScope.launch {
             try {
-                _clients.value = clientsRepository.getClients()
+                _allClients.value = clientsRepository.getClients()
             } catch (e: Exception) {
-                _toastMessage.value = "Error al cargar clientes"
+                handleError("Error al cargar clientes", e)
             }
         }
     }
 
-    fun createUnit(unit: CreateUnitRequest) {
+    private fun fetchCategories() {
         viewModelScope.launch {
-            val response = repository.createUnit(unit)
-            if (response.success) {
-                fetchUnits()
-                _toastMessage.value = "Unidad creada"
-            } else {
-                _toastMessage.value = "Error al crear unidad"
+            try {
+                _categories.value = categoriesRepository.getCategories()
+            } catch (e: Exception) {
+                handleError("Error al cargar categorías", e)
+            }
+        }
+    }
+
+    fun onClientSelected(clientId: Int) {
+        _selectedClient.value = _allClients.value?.find { it.id == clientId }
+    }
+
+    fun prepareForEdit(unit: Unit) {
+        _selectedClient.value = _allClients.value?.find { it.id == unit.idCliente }
+    }
+
+    fun clearSelection() {
+        _selectedClient.value = null
+    }
+
+    fun createUnit(request: CreateUnitRequest) {
+        viewModelScope.launch {
+            try {
+                val response = repository.createUnit(request)
+                if (response.success) {
+                    fetchUnits() 
+                    _successMessage.value = response.message
+                } else {
+                    _errorMessage.value = "Error al crear: ${response.message}"
+                }
+            } catch (e: Exception) {
+                handleError("Excepción al crear unidad", e)
             }
         }
     }
 
     fun updateUnit(unit: Unit) {
         viewModelScope.launch {
-            val response = repository.updateUnit(unit)
-            if (response.success) {
-                fetchUnits()
-                _toastMessage.value = "Unidad actualizada"
-            } else {
-                _toastMessage.value = "Error al actualizar unidad"
+            try {
+                val response = repository.updateUnit(unit)
+                if (response.success) {
+                    fetchUnits()
+                    _successMessage.value = response.message
+                } else {
+                    _errorMessage.value = "Error al actualizar: ${response.message}"
+                }
+            } catch (e: Exception) {
+                handleError("Excepción al actualizar unidad", e)
             }
         }
     }
 
     fun deleteUnit(unitId: Int) {
         viewModelScope.launch {
-            val response = repository.deleteUnit(unitId)
-            if (response.success) {
-                fetchUnits()
-                _toastMessage.value = "Unidad eliminada"
-            } else {
-                _toastMessage.value = "Error al eliminar unidad"
+            try {
+                val response = repository.deleteUnit(unitId)
+                if (response.success) {
+                    fetchUnits()
+                    _successMessage.value = response.message
+                } else {
+                    _errorMessage.value = "Error al eliminar: ${response.message}"
+                }
+            } catch (e: Exception) {
+                handleError("Excepción al eliminar unidad", e)
             }
         }
     }
+    
+    // Public function to post validation errors from the Fragment
+    fun postValidationError(message: String) {
+        _errorMessage.value = message
+    }
 
-    fun findClientPosition(clientId: Int): Int {
-        return _clients.value?.indexOfFirst { it.id == clientId } ?: -1
+    private fun handleError(message: String, e: Exception) {
+        val errorMsg = "$message: ${e.message}"
+        _errorMessage.value = message
+        Log.e("UnitsViewModel", errorMsg, e)
     }
 }

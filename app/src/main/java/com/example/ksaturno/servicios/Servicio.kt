@@ -1,9 +1,8 @@
 package com.example.ksaturno.servicios
 
 import com.google.gson.annotations.SerializedName
-import java.util.Date
 
-// Dates are now Strings to match the API response and avoid parsing errors.
+// Dates are Strings to match the API response and avoid parsing errors.
 // The conversion to Date objects will be handled in the UI layer when needed.
 data class Servicio(
     @SerializedName("id_servicio") val idServicio: Int,
@@ -18,7 +17,8 @@ data class Servicio(
     @SerializedName("comentarios") val comentarios: String?,
     @SerializedName("id_factura") val idFactura: Int?,
     @SerializedName("periodo_pago") val periodoPago: String,
-    @SerializedName("tarjeta_sim") val tarjetaSim: String?
+    @SerializedName("tarjeta_sim") val tarjetaSim: String?,
+    @SerializedName("iccid") val iccid: String? // New field
 ) {
     override fun toString(): String {
         return tipo

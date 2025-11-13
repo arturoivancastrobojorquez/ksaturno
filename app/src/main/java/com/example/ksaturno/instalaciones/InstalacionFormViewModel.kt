@@ -1,5 +1,6 @@
 package com.example.ksaturno.instalaciones
 
+import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -12,7 +13,7 @@ import kotlinx.coroutines.launch
 
 class InstalacionFormViewModel : ViewModel() {
 
-    // The LiveData for Units has been removed.
+    private val repository = InstalacionesRepository(RetrofitClient.instance)
 
     private val _servicios = MutableLiveData<List<Servicio>>()
     val servicios: LiveData<List<Servicio>> = _servicios
@@ -20,36 +21,42 @@ class InstalacionFormViewModel : ViewModel() {
     private val _tecnicos = MutableLiveData<List<Technician>>()
     val tecnicos: LiveData<List<Technician>> = _tecnicos
 
-    private val _saveResult = MutableLiveData<ApiResponse>()
-    val saveResult: LiveData<ApiResponse> = _saveResult
+    // This will hold the ID of the newly created installation
+    private val _newInstallationId = MutableLiveData<Int?>()
+    val newInstallationId: LiveData<Int?> = _newInstallationId
 
     private val _error = MutableLiveData<String>()
     val error: LiveData<String> = _error
 
     fun fetchSpinnerData() {
         viewModelScope.launch {
+            // In a real app, you might want to fetch these from their own repositories
             try {
-                // The call to getUnits() has been removed.
                 _servicios.postValue(RetrofitClient.instance.getServicios().body())
                 _tecnicos.postValue(RetrofitClient.instance.getTechnicians().body())
             } catch (e: Exception) {
-                _error.postValue("Error al cargar datos para los spinners: ${e.message}")
+                _error.postValue("Error al cargar datos: ${e.message}")
             }
         }
     }
 
-    fun saveInstalacion(request: CreateInstalacionRequest) {
+    fun createInstalacion(request: CreateInstalacionRequest) {
         viewModelScope.launch {
             try {
-                val response = RetrofitClient.instance.createInstalacion(request)
-                if (response.isSuccessful) {
-                    _saveResult.postValue(response.body())
+                val response = repository.createInstalacion(request)
+                if (response.success && response.newId != null) {
+                    _newInstallationId.postValue(response.newId)
                 } else {
-                    _error.postValue("Error al guardar la instalación: ${response.message()}")
+                    _error.postValue(response.message ?: "Error al crear la instalación, no se recibió ID.")
                 }
             } catch (e: Exception) {
-                _error.postValue("Excepción al guardar la instalación: ${e.message}")
+                Log.e("InstalacionFormVM", "Exception creating installation", e)
+                _error.postValue(e.message)
             }
         }
+    }
+
+    fun onNavigationComplete() {
+        _newInstallationId.value = null
     }
 }

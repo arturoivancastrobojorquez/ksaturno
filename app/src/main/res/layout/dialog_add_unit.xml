@@ -26,11 +26,19 @@
             android:layout_height="wrap_content"
             android:text="Cliente" />
 
-        <Spinner
-            android:id="@+id/spinner_client"
+        <TextView
+            android:id="@+id/text_view_select_client_for_unit"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:minHeight="48dp"
+            android:background="@android:drawable/edit_text"
+            android:clickable="true"
+            android:drawableEnd="@drawable/ic_search"
+            android:drawablePadding="8dp"
+            android:focusable="true"
+            android:gravity="center_vertical"
+            android:hint="Seleccionar cliente..."
+            android:padding="12dp"
+            android:textSize="18sp"
             android:layout_marginBottom="16dp" />
 
         <TextView
@@ -42,6 +50,7 @@
             android:id="@+id/spinner_category"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:minHeight="48dp"
             android:layout_marginBottom="16dp" />
 
         <TextView
@@ -54,7 +63,10 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="16dp"
-            android:hint="YYYY-MM-DD" />
+            android:hint="Seleccionar fecha..."
+            android:focusable="false"
+            android:clickable="true"
+            android:minHeight="48dp" />
 
         <TextView
             android:layout_width="wrap_content"
@@ -70,14 +82,27 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Estado" />
+            android:text="ICCID" />
 
         <EditText
-            android:id="@+id/edit_text_status"
+            android:id="@+id/edit_text_iccid"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="16dp"
-            android:hint="Ej: activa" />
+            android:maxLength="22"
+            android:inputType="number" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Estado" />
+
+        <Spinner
+            android:id="@+id/spinner_unit_status"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:minHeight="48dp"
+            android:layout_marginBottom="16dp" />
 
         <TextView
             android:layout_width="wrap_content"
