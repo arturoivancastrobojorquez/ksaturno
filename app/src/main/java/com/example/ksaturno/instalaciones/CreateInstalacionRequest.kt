@@ -3,11 +3,10 @@ package com.example.ksaturno.instalaciones
 import com.google.gson.annotations.SerializedName
 
 data class CreateInstalacionRequest(
-    @SerializedName("id_servicio") val idServicio: Int,
-    // idUnidad has been removed. The unit is related via the service.
-    @SerializedName("id_tecnico") val idTecnico: Int,
-    @SerializedName("fecha_instalacion") val fechaInstalacion: String,
-    @SerializedName("componentes_instalados") val componentesInstalados: String?,
+    @SerializedName("id_servicio") val id_servicio: Int,
+    @SerializedName("id_tecnico") val id_tecnico: Int,
+    @SerializedName("fecha_instalacion") val fecha_instalacion: String,
+    @SerializedName("componentes_instalados") val componentes_instalados: String?,
     @SerializedName("estado") val estado: String?,
     @SerializedName("comentarios") val comentarios: String?
 )

@@ -43,7 +43,6 @@ class InstalacionFormFragment : Fragment() {
     }
 
     private fun setupViews() {
-        // Setup Date Picker
         val calendar = Calendar.getInstance()
         binding.etFechaInstalacion.setOnClickListener {
             DatePickerDialog(
@@ -59,7 +58,6 @@ class InstalacionFormFragment : Fragment() {
             ).show()
         }
 
-        // Button now triggers the creation process
         binding.btnNextStep.setOnClickListener { saveAndProceed() }
     }
 
@@ -76,13 +74,11 @@ class InstalacionFormFragment : Fragment() {
             binding.spinnerTecnico.adapter = adapter
         }
 
-        // Observer for the new installation ID
         viewModel.newInstallationId.observe(viewLifecycleOwner) { newId ->
             if (newId != null) {
-                // Navigate to the next step with the new ID
                 val action = InstalacionFormFragmentDirections.actionStep1ToStep2(newId)
                 findNavController().navigate(action)
-                viewModel.onNavigationComplete() // Reset the state
+                viewModel.onNavigationComplete()
             }
         }
 
@@ -101,10 +97,10 @@ class InstalacionFormFragment : Fragment() {
         }
 
         val request = CreateInstalacionRequest(
-            idServicio = servicio.idServicio,
-            idTecnico = tecnico.idTecnico,
-            fechaInstalacion = binding.etFechaInstalacion.text.toString(),
-            componentesInstalados = binding.etComponentes.text.toString(),
+            id_servicio = servicio.idServicio,
+            id_tecnico = tecnico.idTecnico,
+            fecha_instalacion = binding.etFechaInstalacion.text.toString(),
+            componentes_instalados = binding.etComponentes.text.toString(),
             estado = binding.etEstado.text.toString(),
             comentarios = binding.etComentarios.text.toString()
         )
