@@ -20,6 +20,18 @@ class ServiciosRepository(private val apiService: ApiService) {
         }
     }
 
+    // NEW: Get services filtered by client directly from the API
+    suspend fun getServiciosByClient(clientId: Int): List<Servicio> {
+        return withContext(Dispatchers.IO) {
+            val response = apiService.getServiciosByClient(clientId)
+            if (response.isSuccessful) {
+                response.body() ?: emptyList()
+            } else {
+                throw Exception("Error al obtener servicios del cliente: ${response.code()}")
+            }
+        }
+    }
+
     suspend fun createServicio(request: CreateServicioRequest): ApiResponse {
         return withContext(Dispatchers.IO) {
             try {
@@ -63,7 +75,17 @@ class ServiciosRepository(private val apiService: ApiService) {
     }
 
     suspend fun deleteServicio(id: Int): ApiResponse {
-        // ... (delete logic remains the same)
-        return withContext(Dispatchers.IO) {ApiResponse(false, "Not implemented")}
+        return withContext(Dispatchers.IO) {
+            try {
+                val response = apiService.deleteServicio(ServicioIdBody(id))
+                if (response.isSuccessful && response.body() != null) {
+                    response.body()!!
+                } else {
+                    ApiResponse(false, "Error de red: ${response.code()}")
+                }
+            } catch (e: Exception) {
+                ApiResponse(false, "Excepción de red: ${e.message}")
+            }
+        }
     }
 }

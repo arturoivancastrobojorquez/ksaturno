@@ -110,6 +110,10 @@ interface ApiService {
     @GET("servicios/listar.php")
     suspend fun getServicios(): Response<List<Servicio>>
 
+    // NEW: Filter services by client directly from the API
+    @GET("servicios/filtrarporcliente.php")
+    suspend fun getServiciosByClient(@Query("id_cliente") clientId: Int): Response<List<Servicio>>
+
     @POST("servicios/grabar.php")
     suspend fun createServicio(@Body request: CreateServicioRequest): Response<ApiResponse>
 

@@ -7,19 +7,29 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.ksaturno.ApiResponse
 import com.example.ksaturno.RetrofitClient
+import com.example.ksaturno.clients.Client
 import com.example.ksaturno.servicios.Servicio
+import com.example.ksaturno.servicios.ServiciosRepository
 import com.example.ksaturno.technicians.Technician
+import com.example.ksaturno.technicians.TechniciansRepository
+import com.example.ksaturno.units.UnitsRepository
 import kotlinx.coroutines.launch
 
 class InstalacionFormViewModel : ViewModel() {
 
     private val repository = InstalacionesRepository(RetrofitClient.instance)
+    private val serviciosRepository = ServiciosRepository(RetrofitClient.instance)
+    private val techniciansRepository = TechniciansRepository(RetrofitClient.instance)
+    private val unitsRepository = UnitsRepository(RetrofitClient.instance)
 
     private val _servicios = MutableLiveData<List<Servicio>>()
     val servicios: LiveData<List<Servicio>> = _servicios
 
     private val _tecnicos = MutableLiveData<List<Technician>>()
     val tecnicos: LiveData<List<Technician>> = _tecnicos
+
+    private val _selectedClient = MutableLiveData<Client?>()
+    val selectedClient: LiveData<Client?> = _selectedClient
 
     // This will hold the ID of the newly created installation
     private val _newInstallationId = MutableLiveData<Int?>()
@@ -30,12 +40,39 @@ class InstalacionFormViewModel : ViewModel() {
 
     fun fetchSpinnerData() {
         viewModelScope.launch {
-            // In a real app, you might want to fetch these from their own repositories
             try {
-                _servicios.postValue(RetrofitClient.instance.getServicios().body())
-                _tecnicos.postValue(RetrofitClient.instance.getTechnicians().body())
+                // Load technicians (always needed)
+                _tecnicos.postValue(techniciansRepository.getTechnicians())
+                
+                // Services list is initially empty until a client is selected
+                _servicios.postValue(emptyList()) 
+                
             } catch (e: Exception) {
-                _error.postValue("Error al cargar datos: ${e.message}")
+                val errorMsg = "Error al cargar datos iniciales: ${e.message}"
+                _error.postValue(errorMsg)
+                Log.e("InstalacionFormVM", errorMsg, e)
+            }
+        }
+    }
+
+    fun processClientSearchResult(clientId: Int, clientName: String?) {
+        val client = Client(clientId, clientName, null, null, null, null) 
+        _selectedClient.value = client
+        
+        loadServicesForClient(clientId)
+    }
+
+    private fun loadServicesForClient(clientId: Int) {
+        viewModelScope.launch {
+            try {
+                // Efficiently fetch ONLY the services for this client from the API
+                val clientServices = serviciosRepository.getServiciosByClient(clientId)
+                _servicios.postValue(clientServices)
+
+            } catch (e: Exception) {
+                val errorMsg = "Error al cargar servicios del cliente: ${e.message}"
+                _error.postValue(errorMsg)
+                Log.e("InstalacionFormVM", errorMsg, e)
             }
         }
     }
@@ -50,13 +87,19 @@ class InstalacionFormViewModel : ViewModel() {
                     _error.postValue(response.message ?: "Error al crear la instalación, no se recibió ID.")
                 }
             } catch (e: Exception) {
-                Log.e("InstalacionFormVM", "Exception creating installation", e)
-                _error.postValue(e.message)
+                val errorMsg = "Excepción al crear instalación: ${e.message}"
+                _error.postValue(errorMsg)
+                Log.e("InstalacionFormVM", errorMsg, e)
             }
         }
     }
 
     fun onNavigationComplete() {
         _newInstallationId.value = null
+    }
+    
+    fun clearSelection() {
+        _selectedClient.value = null
+        _servicios.value = emptyList()
     }
 }
