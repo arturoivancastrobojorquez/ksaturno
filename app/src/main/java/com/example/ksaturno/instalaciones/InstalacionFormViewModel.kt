@@ -5,7 +5,6 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.ksaturno.ApiResponse
 import com.example.ksaturno.RetrofitClient
 import com.example.ksaturno.clients.Client
 import com.example.ksaturno.servicios.Servicio
@@ -13,6 +12,7 @@ import com.example.ksaturno.servicios.ServiciosRepository
 import com.example.ksaturno.technicians.Technician
 import com.example.ksaturno.technicians.TechniciansRepository
 import com.example.ksaturno.units.UnitsRepository
+import com.example.ksaturno.units.Unit as SaturnoUnit
 import kotlinx.coroutines.launch
 
 class InstalacionFormViewModel : ViewModel() {
@@ -31,6 +31,9 @@ class InstalacionFormViewModel : ViewModel() {
     private val _selectedClient = MutableLiveData<Client?>()
     val selectedClient: LiveData<Client?> = _selectedClient
 
+    private val _unitName = MutableLiveData<String>()
+    val unitName: LiveData<String> = _unitName
+
     // This will hold the ID of the newly created installation
     private val _newInstallationId = MutableLiveData<Int?>()
     val newInstallationId: LiveData<Int?> = _newInstallationId
@@ -38,14 +41,23 @@ class InstalacionFormViewModel : ViewModel() {
     private val _error = MutableLiveData<String>()
     val error: LiveData<String> = _error
 
+    private var loadedUnits: List<SaturnoUnit> = emptyList()
+    
+    private var _selectedServiceId: Int? = null
+    fun getSavedServiceId(): Int? = _selectedServiceId
+
     fun fetchSpinnerData() {
         viewModelScope.launch {
             try {
-                // Load technicians (always needed)
-                _tecnicos.postValue(techniciansRepository.getTechnicians())
+                // Load technicians only if not already loaded
+                if (_tecnicos.value.isNullOrEmpty()) {
+                    _tecnicos.postValue(techniciansRepository.getTechnicians())
+                }
                 
-                // Services list is initially empty until a client is selected
-                _servicios.postValue(emptyList()) 
+                // Only clear services if no client is selected
+                if (_selectedClient.value == null) {
+                    _servicios.postValue(emptyList()) 
+                }
                 
             } catch (e: Exception) {
                 val errorMsg = "Error al cargar datos iniciales: ${e.message}"
@@ -59,22 +71,31 @@ class InstalacionFormViewModel : ViewModel() {
         val client = Client(clientId, clientName, null, null, null, null) 
         _selectedClient.value = client
         
-        loadServicesForClient(clientId)
+        loadDataForClient(clientId)
     }
 
-    private fun loadServicesForClient(clientId: Int) {
+    private fun loadDataForClient(clientId: Int) {
         viewModelScope.launch {
             try {
                 // Efficiently fetch ONLY the services for this client from the API
                 val clientServices = serviciosRepository.getServiciosByClient(clientId)
                 _servicios.postValue(clientServices)
 
+                // Load units for this client
+                loadedUnits = unitsRepository.getUnitsByClient(clientId)
+
             } catch (e: Exception) {
-                val errorMsg = "Error al cargar servicios del cliente: ${e.message}"
+                val errorMsg = "Error al cargar datos del cliente: ${e.message}"
                 _error.postValue(errorMsg)
                 Log.e("InstalacionFormVM", errorMsg, e)
             }
         }
+    }
+
+    fun onServiceSelected(servicio: Servicio) {
+        val unit = loadedUnits.find { it.idUnidad == servicio.idUnidad }
+        _unitName.value = unit?.nombreUnidad ?: "Unidad desconocida"
+        _selectedServiceId = servicio.idServicio
     }
 
     fun createInstalacion(request: CreateInstalacionRequest) {
@@ -101,5 +122,8 @@ class InstalacionFormViewModel : ViewModel() {
     fun clearSelection() {
         _selectedClient.value = null
         _servicios.value = emptyList()
+        loadedUnits = emptyList()
+        _unitName.value = ""
+        _selectedServiceId = null
     }
 }

@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <paths xmlns:android="http://schemas.android.com/apk/res/android">
-    <!-- Define the path to the cache directory where we will create temporary image files -->
+    <!-- Permite compartir archivos desde la caché -->
     <cache-path name="shared_images" path="." />
+    <!-- Permite compartir archivos desde getExternalFilesDir(Environment.DIRECTORY_DOCUMENTS) -->
+    <external-files-path name="documents" path="Documents" />
 </paths>

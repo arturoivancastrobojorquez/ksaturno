@@ -1,9 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
 <androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_margin="8dp"
-    app:cardCornerRadius="8dp">
+    app:cardCornerRadius="8dp"
+    app:cardElevation="4dp">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -11,37 +14,83 @@
         android:orientation="vertical"
         android:padding="16dp">
 
-        <TextView
-            android:id="@+id/tv_instalacion_id"
-            android:layout_width="wrap_content"
+        <LinearLayout
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Instalacion ID: 1"
-            android:textAppearance="@style/TextAppearance.AppCompat.Large" />
+            android:orientation="horizontal">
+
+            <TextView
+                android:id="@+id/tv_instalacion_id"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:textSize="18sp"
+                android:textStyle="bold"
+                tools:text="Instalacion ID: 123" />
+
+            <ImageView
+                android:id="@+id/btn_generate_invoice"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:layout_marginEnd="16dp"
+                android:src="@drawable/ic_invoice"
+                android:clickable="true"
+                android:focusable="true"
+                android:contentDescription="Generar Factura"
+                app:tint="#4CAF50" />
+
+            <ImageView
+                android:id="@+id/btn_edit_instalacion"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:layout_marginEnd="16dp"
+                android:src="@drawable/ic_edit"
+                android:clickable="true"
+                android:focusable="true"
+                android:contentDescription="Editar" />
+
+            <ImageView
+                android:id="@+id/btn_delete_instalacion"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:src="@drawable/ic_delete"
+                android:clickable="true"
+                android:focusable="true"
+                android:contentDescription="Eliminar" />
+        </LinearLayout>
 
         <TextView
             android:id="@+id/tv_unidad_nombre"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Unidad: Camioneta 1"/>
+            android:layout_marginTop="4dp"
+            android:textSize="16sp"
+            tools:text="Unidad: Unidad 1" />
 
         <TextView
             android:id="@+id/tv_tecnico_nombre"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Tecnico: Juan Perez"/>
+            android:layout_marginTop="4dp"
+            android:textSize="14sp"
+            tools:text="Técnico: Juan Perez" />
 
         <TextView
             android:id="@+id/tv_fecha_instalacion"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Fecha: 2024-01-15"/>
+            android:layout_marginTop="4dp"
+            android:textSize="14sp"
+            tools:text="Fecha: 01/01/2025" />
 
         <TextView
             android:id="@+id/tv_instalacion_estado"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Estado: Completada"/>
+            android:layout_marginTop="4dp"
+            android:textSize="14sp"
+            android:textStyle="italic"
+            tools:text="Estado: Pendiente" />
 
     </LinearLayout>
-
 </androidx.cardview.widget.CardView>

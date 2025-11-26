@@ -11,7 +11,13 @@ import com.example.ksaturno.checklist.CreateListaVerificacionRequest
 import com.example.ksaturno.clients.Client
 import com.example.ksaturno.clients.ClientIdBody
 import com.example.ksaturno.clients.CreateClientRequest
+import com.example.ksaturno.empresa.CreateEmpresaRequest
+import com.example.ksaturno.empresa.Empresa
+import com.example.ksaturno.empresa.EmpresaIdBody
 import com.example.ksaturno.evidencias.CreateEvidenciaRequest
+import com.example.ksaturno.facturas.Factura
+import com.example.ksaturno.facturas.GenerateInvoiceRequest
+import com.example.ksaturno.home.RenewalAlert
 import com.example.ksaturno.instalaciones.CreateInstalacionRequest
 import com.example.ksaturno.instalaciones.Instalacion
 import com.example.ksaturno.instalaciones.InstalacionIdBody
@@ -133,10 +139,10 @@ interface ApiService {
     @PUT("instalaciones/actualizar.php/{id}")
     suspend fun updateInstalacion(@Path("id") id: Int, @Body instalacion: Instalacion): Response<ApiResponse>
 
-    @HTTP(method = "DELETE", path = "instalaciones/eliminar.php", hasBody = true)
+    @POST("instalaciones/eliminar.php")
     suspend fun deleteInstalacion(@Body body: InstalacionIdBody): Response<ApiResponse>
 
-    @POST("listas_verificacion_instalacion/grabar.php")
+    @POST("items_lista_verificacion/grabar_respuesta.php") 
     suspend fun saveChecklistItem(@Body request: CreateListaVerificacionRequest): Response<ApiResponse>
 
     @GET("instalaciones/evidencias_pendientes.php")
@@ -144,4 +150,32 @@ interface ApiService {
 
     @POST("evidencias/grabar.php")
     suspend fun saveEvidence(@Body request: CreateEvidenciaRequest): Response<ApiResponse>
+    
+    // Empresa
+    @GET("empresas/listar.php")
+    suspend fun getEmpresas(): Response<List<Empresa>>
+
+    @POST("empresas/grabar.php")
+    suspend fun createEmpresa(@Body request: CreateEmpresaRequest): Response<ApiResponse>
+
+    @PUT("empresas/actualizar.php")
+    suspend fun updateEmpresa(@Body empresa: Empresa): Response<ApiResponse>
+
+    @HTTP(method = "DELETE", path = "empresas/eliminar.php", hasBody = true)
+    suspend fun deleteEmpresa(@Body body: EmpresaIdBody): Response<ApiResponse>
+
+    // Facturas - Generación automática
+    @POST("facturas/generar_desde_instalacion.php")
+    suspend fun generateInvoiceFromInstallation(@Body request: GenerateInvoiceRequest): Response<ApiResponse>
+
+    // Facturas - Finanzas por Cliente
+    @GET("facturas/listar_por_cliente.php")
+    suspend fun getFacturasByClient(
+        @Query("id_cliente") clientId: Int,
+        @Query("estado") estado: String
+    ): Response<List<Factura>>
+    
+    // Renovaciones
+    @GET("reportes/alerta_renovaciones.php")
+    suspend fun getRenewalAlerts(): Response<List<RenewalAlert>>
 }

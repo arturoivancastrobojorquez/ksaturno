@@ -1,104 +1,123 @@
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:orientation="vertical"
-    android:padding="16dp">
+    android:layout_height="match_parent">
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Cliente" />
-    <TextView
-        android:id="@+id/text_view_select_client"
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@android:drawable/edit_text"
-        android:clickable="true"
-        android:drawableEnd="@drawable/ic_search"
-        android:drawablePadding="8dp"
-        android:focusable="true"
-        android:gravity="center_vertical"
-        android:hint="Seleccionar cliente..."
-        android:padding="12dp"
-        android:textSize="18sp"
-        android:layout_marginBottom="8dp" />
+        android:orientation="vertical"
+        android:padding="16dp">
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Servicio (Selecciona un cliente primero)" />
-    <Spinner
-        android:id="@+id/spinner_servicio"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:minHeight="48dp"
-        android:layout_marginBottom="8dp" />
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Cliente" />
+        <TextView
+            android:id="@+id/text_view_select_client"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@android:drawable/edit_text"
+            android:clickable="true"
+            android:drawableEnd="@drawable/ic_search"
+            android:drawablePadding="8dp"
+            android:focusable="true"
+            android:gravity="center_vertical"
+            android:hint="Seleccionar cliente..."
+            android:padding="12dp"
+            android:textSize="18sp"
+            android:layout_marginBottom="8dp" />
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Técnico" />
-    <Spinner
-        android:id="@+id/spinner_tecnico"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:minHeight="48dp"
-        android:layout_marginBottom="8dp" />
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Servicio (Selecciona un cliente primero)" />
+        <Spinner
+            android:id="@+id/spinner_servicio"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:minHeight="48dp"
+            android:layout_marginBottom="8dp" />
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Fecha de Instalación" />
-    <EditText
-        android:id="@+id/et_fecha_instalacion"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:hint="Seleccionar fecha..."
-        android:focusable="false"
-        android:clickable="true"
-        android:minHeight="48dp"
-        android:layout_marginBottom="8dp" />
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Unidad" />
+        <TextView
+            android:id="@+id/tv_nombre_unidad"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@android:drawable/edit_text"
+            android:padding="12dp"
+            android:textSize="18sp"
+            android:hint="Nombre de la unidad"
+            android:layout_marginBottom="8dp" />
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Componentes Instalados" />
-    <EditText
-        android:id="@+id/et_componentes"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:hint="Componentes..."
-        android:minHeight="48dp"
-        android:layout_marginBottom="8dp" />
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Técnico" />
+        <Spinner
+            android:id="@+id/spinner_tecnico"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:minHeight="48dp"
+            android:layout_marginBottom="8dp" />
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Estado" />
-    <Spinner
-        android:id="@+id/spinner_estado"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:minHeight="48dp"
-        android:layout_marginBottom="8dp" />
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Fecha de Instalación" />
+        <EditText
+            android:id="@+id/et_fecha_instalacion"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Seleccionar fecha..."
+            android:focusable="false"
+            android:clickable="true"
+            android:minHeight="48dp"
+            android:layout_marginBottom="8dp" />
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Comentarios" />
-    <EditText
-        android:id="@+id/et_comentarios"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:hint="Comentarios..."
-        android:minHeight="48dp"
-        android:layout_marginBottom="16dp" />
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Componentes Instalados" />
+        <EditText
+            android:id="@+id/et_componentes"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Componentes..."
+            android:minHeight="48dp"
+            android:layout_marginBottom="8dp" />
 
-    <Button
-        android:id="@+id/btn_next_step"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Siguiente"
-        android:layout_gravity="center_horizontal"/>
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Estado" />
+        <Spinner
+            android:id="@+id/spinner_estado"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:minHeight="48dp"
+            android:layout_marginBottom="8dp" />
 
-</LinearLayout>
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Comentarios" />
+        <EditText
+            android:id="@+id/et_comentarios"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Comentarios..."
+            android:minHeight="48dp"
+            android:layout_marginBottom="16dp" />
+
+        <Button
+            android:id="@+id/btn_next_step"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Siguiente"
+            android:layout_gravity="center_horizontal"/>
+
+    </LinearLayout>
+</ScrollView>

@@ -27,6 +27,9 @@
         <action
             android:id="@+id/action_new_installation_to_step1"
             app:destination="@id/instalacionPaso1Fragment" />
+        <action
+            android:id="@+id/action_InstalacionesFragment_to_editInstalacionFragment"
+            app:destination="@id/instalacionPaso1Fragment" />
     </fragment>
 
     <fragment
@@ -39,6 +42,15 @@
     <fragment android:id="@+id/technicians" android:name="com.example.ksaturno.technicians.TechniciansFragment" />
     <fragment android:id="@+id/categories" android:name="com.example.ksaturno.categories.CategoriesFragment" />
     <fragment android:id="@+id/checklist_items" android:name="com.example.ksaturno.checklist.ChecklistFragment" />
+    <fragment android:id="@+id/empresas" android:name="com.example.ksaturno.empresa.EmpresasFragment" android:label="Empresas" tools:layout="@layout/fragment_empresas" />
+    
+    <!-- Finance -->
+    <fragment
+        android:id="@+id/invoices_by_client"
+        android:name="com.example.ksaturno.facturas.FacturasFinanzasFragment"
+        android:label="Facturas por Cliente"
+        tools:layout="@layout/fragment_facturas_finanzas" />
+    
     <dialog android:id="@+id/clientSearchFragment" android:name="com.example.ksaturno.clients.ClientSearchFragment" />
 
     <!-- Installation Wizard Flow -->
@@ -46,6 +58,10 @@
         android:id="@+id/instalacionPaso1Fragment"
         android:name="com.example.ksaturno.instalaciones.InstalacionFormFragment"
         android:label="Paso 1: Datos de Instalación">
+        <argument
+            android:name="installationId"
+            app:argType="integer"
+            android:defaultValue="-1" />
         <action
             android:id="@+id/action_step1_to_step2"
             app:destination="@id/instalacionPaso2ChecklistFragment" />

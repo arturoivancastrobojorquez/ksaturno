@@ -5,6 +5,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.AdapterView
 import android.widget.ArrayAdapter
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
@@ -64,7 +65,7 @@ class InstalacionFormFragment : Fragment() {
                 requireContext(),
                 { _, year, month, dayOfMonth ->
                     calendar.set(year, month, dayOfMonth)
-                    val format = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
+                    val format = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
                     binding.etFechaInstalacion.setText(format.format(calendar.time))
                 },
                 calendar.get(Calendar.YEAR),
@@ -79,6 +80,18 @@ class InstalacionFormFragment : Fragment() {
         statusAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
         binding.spinnerEstado.adapter = statusAdapter
 
+        // Service Spinner Listener
+        binding.spinnerServicio.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+            override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
+                val servicio = parent?.getItemAtPosition(position) as? Servicio
+                if (servicio != null) {
+                    viewModel.onServiceSelected(servicio)
+                }
+            }
+
+            override fun onNothingSelected(parent: AdapterView<*>?) {}
+        }
+
         binding.btnNextStep.setOnClickListener { saveAndProceed() }
     }
 
@@ -87,10 +100,23 @@ class InstalacionFormFragment : Fragment() {
             binding.textViewSelectClient.text = client?.nombre ?: "Seleccionar cliente..."
         }
 
-        viewModel.servicios.observe(viewLifecycleOwner) {
-            val adapter = ArrayAdapter(requireContext(), android.R.layout.simple_spinner_item, it)
+        viewModel.servicios.observe(viewLifecycleOwner) { servicios ->
+            val adapter = ArrayAdapter(requireContext(), android.R.layout.simple_spinner_item, servicios)
             adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
             binding.spinnerServicio.adapter = adapter
+            
+            // Restore selection if needed
+            val savedId = viewModel.getSavedServiceId()
+            if (savedId != null) {
+                val index = servicios.indexOfFirst { it.idServicio == savedId }
+                if (index != -1) {
+                    binding.spinnerServicio.setSelection(index)
+                }
+            }
+        }
+        
+        viewModel.unitName.observe(viewLifecycleOwner) { name ->
+            binding.tvNombreUnidad.text = name
         }
 
         viewModel.tecnicos.observe(viewLifecycleOwner) {
@@ -132,11 +158,22 @@ class InstalacionFormFragment : Fragment() {
             Toast.makeText(context, "Por favor, completa todos los campos", Toast.LENGTH_SHORT).show()
             return
         }
+        
+        // Convert UI date (dd/MM/yyyy) to API format (yyyy-MM-dd) before sending
+        val uiDate = binding.etFechaInstalacion.text.toString()
+        val apiDate = try {
+            val inputFormat = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
+            val outputFormat = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
+            val date = inputFormat.parse(uiDate)
+            outputFormat.format(date!!)
+        } catch (e: Exception) {
+            uiDate // Fallback to original if parsing fails
+        }
 
         val request = CreateInstalacionRequest(
             id_servicio = servicio.idServicio,
             id_tecnico = tecnico.idTecnico,
-            fecha_instalacion = binding.etFechaInstalacion.text.toString(),
+            fecha_instalacion = apiDate,
             componentes_instalados = binding.etComponentes.text.toString(),
             estado = estado,
             comentarios = binding.etComentarios.text.toString()

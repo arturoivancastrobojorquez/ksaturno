@@ -41,11 +41,16 @@ class ChecklistRepository(private val apiService: ApiService) {
 
     suspend fun saveChecklistItemState(request: CreateListaVerificacionRequest): ApiResponse {
         return withContext(Dispatchers.IO) {
-            val response = apiService.saveChecklistItem(request)
-            if (response.isSuccessful && response.body() != null) {
-                response.body()!!
-            } else {
-                ApiResponse(false, "Error de red: ${response.code()}", null)
+            try {
+                val response = apiService.saveChecklistItem(request)
+                if (response.isSuccessful && response.body() != null) {
+                    response.body()!!
+                } else {
+                    // Log error for debugging if needed, but return a safe failure response
+                    ApiResponse(false, "Error de red: ${response.code()}", null)
+                }
+            } catch (e: Exception) {
+                 ApiResponse(false, "Excepción: ${e.message}", null)
             }
         }
     }
