@@ -12,6 +12,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
+import android.widget.EditText
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.core.content.ContextCompat
@@ -87,7 +88,11 @@ class FacturasFinanzasFragment : Fragment() {
             override fun onNothingSelected(parent: AdapterView<*>?) {}
         }
 
-        adapter = FacturasAdapter(emptyList())
+        // Inicializar adaptador con callback para el botón Pagar
+        adapter = FacturasAdapter(
+            emptyList(),
+            onPayClick = { factura -> showPaymentDialog(factura) }
+        )
         binding.rvFacturasCliente.adapter = adapter
         
         binding.btnGeneratePdf.setOnClickListener {
@@ -125,6 +130,49 @@ class FacturasFinanzasFragment : Fragment() {
                 Toast.makeText(context, "Este cliente no tiene facturas pendientes o vencidas", Toast.LENGTH_LONG).show()
             }
         }
+        
+        viewModel.paymentResult.observe(viewLifecycleOwner) { message ->
+            if (!message.isNullOrEmpty()) {
+                Toast.makeText(context, message, Toast.LENGTH_LONG).show()
+                loadData() // Refresh list
+                viewModel.clearPaymentResult()
+            }
+        }
+    }
+    
+    private fun showPaymentDialog(factura: Factura) {
+        val dialogView = layoutInflater.inflate(R.layout.dialog_registrar_pago, null)
+        val etMonto = dialogView.findViewById<EditText>(R.id.et_monto_pago)
+        val spinnerMetodo = dialogView.findViewById<android.widget.Spinner>(R.id.spinner_metodo_pago)
+        val etComentarios = dialogView.findViewById<EditText>(R.id.et_comentarios_pago)
+
+        // Pre-fill amount with total due
+        etMonto.setText(factura.monto.toString())
+
+        // Setup Spinner
+        val metodos = listOf("Efectivo", "Transferencia", "Depósito", "Cheque")
+        val adapter = ArrayAdapter(requireContext(), android.R.layout.simple_spinner_item, metodos)
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+        spinnerMetodo.adapter = adapter
+
+        AlertDialog.Builder(requireContext())
+            .setTitle("Registrar Pago - Factura #${factura.numeroFactura}")
+            .setView(dialogView)
+            .setPositiveButton("Registrar") { _, _ ->
+                val monto = etMonto.text.toString().toDoubleOrNull()
+                val metodo = spinnerMetodo.selectedItem.toString()
+                val comentarios = etComentarios.text.toString()
+
+                if (monto != null && monto > 0) {
+                    if (selectedClientId != null) {
+                        viewModel.registerPayment(factura.idFactura, selectedClientId!!, monto, metodo, comentarios)
+                    }
+                } else {
+                    Toast.makeText(context, "Monto inválido", Toast.LENGTH_SHORT).show()
+                }
+            }
+            .setNegativeButton("Cancelar", null)
+            .show()
     }
     
     private fun loadData() {
@@ -205,9 +253,7 @@ class FacturasFinanzasFragment : Fragment() {
 
         try {
             document.writeTo(FileOutputStream(file))
-            Toast.makeText(context, "PDF generado en: ${file.absolutePath}", Toast.LENGTH_LONG).show()
             
-            // Show success dialog with open option
             AlertDialog.Builder(requireContext())
                 .setTitle("Reporte Generado")
                 .setMessage("El archivo se guardó correctamente.\n\n¿Deseas abrirlo ahora?")

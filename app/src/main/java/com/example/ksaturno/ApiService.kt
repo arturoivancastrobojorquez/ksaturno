@@ -21,6 +21,7 @@ import com.example.ksaturno.home.RenewalAlert
 import com.example.ksaturno.instalaciones.CreateInstalacionRequest
 import com.example.ksaturno.instalaciones.Instalacion
 import com.example.ksaturno.instalaciones.InstalacionIdBody
+import com.example.ksaturno.pagos.CreatePaymentRequest
 import com.example.ksaturno.servicios.CreateServicioRequest
 import com.example.ksaturno.servicios.Servicio
 import com.example.ksaturno.servicios.ServicioIdBody
@@ -178,4 +179,8 @@ interface ApiService {
     // Renovaciones
     @GET("reportes/alerta_renovaciones.php")
     suspend fun getRenewalAlerts(): Response<List<RenewalAlert>>
+    
+    // Pagos
+    @POST("pagos/registrar_pago_factura.php")
+    suspend fun registerPayment(@Body request: CreatePaymentRequest): Response<ApiResponse>
 }
