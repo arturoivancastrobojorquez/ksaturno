@@ -22,6 +22,11 @@ import com.example.ksaturno.instalaciones.CreateInstalacionRequest
 import com.example.ksaturno.instalaciones.Instalacion
 import com.example.ksaturno.instalaciones.InstalacionIdBody
 import com.example.ksaturno.pagos.CreatePaymentRequest
+import com.example.ksaturno.reports.ReporteFacturaServicio
+import com.example.ksaturno.reports.ReporteLineaRecuperar
+import com.example.ksaturno.reports.ReporteLineaSuspendida
+import com.example.ksaturno.reports.ReportePago
+import com.example.ksaturno.reports.ReporteRenovacionVencida
 import com.example.ksaturno.servicios.CreateServicioRequest
 import com.example.ksaturno.servicios.Servicio
 import com.example.ksaturno.servicios.ServicioIdBody
@@ -183,4 +188,20 @@ interface ApiService {
     // Pagos
     @POST("pagos/registrar_pago_factura.php")
     suspend fun registerPayment(@Body request: CreatePaymentRequest): Response<ApiResponse>
+    
+    // REPORTES
+    @GET("reportes/get_detalle_pagos.php")
+    suspend fun getReportePagos(): Response<List<ReportePago>>
+
+    @GET("reportes/get_lineas_por_recuperar.php")
+    suspend fun getReporteLineasRecuperar(): Response<List<ReporteLineaRecuperar>>
+
+    @GET("reportes/get_lineas_suspendidas.php")
+    suspend fun getReporteLineasSuspendidas(): Response<List<ReporteLineaSuspendida>>
+
+    @GET("reportes/get_renovaciones_vencidas.php")
+    suspend fun getReporteRenovacionesVencidas(): Response<List<ReporteRenovacionVencida>>
+
+    @GET("reportes/get_detalle_facturas.php")
+    suspend fun getReporteFacturasServicios(): Response<List<ReporteFacturaServicio>>
 }

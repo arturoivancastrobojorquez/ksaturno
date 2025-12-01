@@ -43,6 +43,7 @@
     <fragment android:id="@+id/categories" android:name="com.example.ksaturno.categories.CategoriesFragment" />
     <fragment android:id="@+id/checklist_items" android:name="com.example.ksaturno.checklist.ChecklistFragment" />
     <fragment android:id="@+id/empresas" android:name="com.example.ksaturno.empresa.EmpresasFragment" android:label="Empresas" tools:layout="@layout/fragment_empresas" />
+    <fragment android:id="@+id/reports" android:name="com.example.ksaturno.reports.ReportsFragment" android:label="Reportes" tools:layout="@layout/fragment_reports" />
     
     <!-- Finance -->
     <fragment
